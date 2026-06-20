@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeToo — Просмотр анкеты</title>
+    <link class="js-meta-title" rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Шапка сайта -->
+    <header class="header">
+        <div class="container header-container">
+            <a href="index.html" class="logo">WeToo</a>
+            <nav class="nav">
+                <a href="index.html" class="btn btn-secondary">Назад в каталог</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="profile-container" id="profile-details">
+            
+            <!-- Левая колонка: Галерея изображений -->
+            <div class="profile-gallery">
+                <div class="main-photo-wrapper">
+                    <img src="" alt="Главное фото" id="profile-main-photo" class="main-photo">
+                </div>
+                <div class="thumbnails-grid" id="profile-thumbnails">
+                    <!-- Дополнительные фотографии загрузятся через JS -->
+                </div>
+            </div>
+
+            <!-- Правая колонка: Информация об анкете -->
+            <div class="profile-info">
+                <div class="profile-header-block">
+                    <h1 class="profile-name" id="profile-name">Загрузка...</h1>
+                    <span class="profile-badge-vip" id="profile-vip-badge" style="display: none;">VIP</span>
+                </div>
+
+                <div class="profile-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Город:</span>
+                        <span class="meta-value" id="profile-city">—</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Возраст:</span>
+                        <span class="meta-value" id="profile-age">—</span>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <div class="profile-description">
+                    <h3>О себе</h3>
+                    <p id="profile-about">Ожидание данных от сервера...</p>
+                </div>
+
+                <hr class="divider">
+
+                <!-- Блок целевых действий / контактов -->
+                <div class="profile-actions">
+                    <a href="#" target="_blank" class="btn btn-primary btn-large" id="profile-contact-btn" style="display: none;">
+                        Написать в Telegram
+                    </a>
+                    <a href="#" class="btn btn-phone btn-large" id="profile-phone-btn" style="display: none;">
+                        Показать телефон
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Подвал сайта -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 WeToo. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <!-- Подключение скриптов -->
+    <script src="api.js"></script>
+    <script src="profile.js"></script>
+</body>
+</html>
