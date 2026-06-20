@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeToo — Разместить анкету</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="header">
+        <div class="container header-container">
+            <a href="index.html" class="logo">WeToo</a>
+            <nav class="nav">
+                <a href="index.html" class="btn btn-secondary">На главную</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="form-section">
+            <h1 class="section-title">Создание новой анкеты</h1>
+            
+            <form id="add-profile-form" class="main-form">
+                
+                <div class="form-group">
+                    <label for="form-name">Ваше имя *</label>
+                    <input type="text" id="form-name" class="form-input" placeholder="Введите имя" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="form-age">Возраст *</label>
+                        <input type="number" id="form-age" class="form-input" min="18" max="99" placeholder="18+" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="form-city">Город *</label>
+                        <select id="form-city" class="form-select" required>
+                            <option value="">Выберите город...</option>
+                            </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="form-telegram">Ваш Telegram (для связи) *</label>
+                    <input type="text" id="form-telegram" class="form-input" placeholder="@username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="form-phone">Телефон (необязательно)</label>
+                    <input type="tel" id="form-phone" class="form-input" placeholder="+7 (999) 000-00-00">
+                </div>
+
+                <div class="form-group">
+                    <label for="form-about">О себе *</label>
+                    <textarea id="form-about" class="form-textarea" rows="5" placeholder="Расскажите о себе..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Фотографии анкеты (Первое фото станет главным) *</label>
+                    <div class="upload-container">
+                        <label for="file-upload" class="upload-label">
+                            <span class="upload-icon">📸</span>
+                            <span>Выбрать фото (макс. 5 шт.)</span>
+                        </label>
+                        <input type="file" id="file-upload" accept="image/*" multiple style="display: none;">
+                    </div>
+                    <div class="upload-preview-grid" id="preview-grid"></div>
+                </div>
+
+                <div class="form-group tariff-group">
+                    <label class="group-title">Выберите тариф размещения *</label>
+                    <div class="plans-grid" id="plans-container">
+                        </div>
+                </div>
+
+                <input type="hidden" id="selected-plan-id" value="" required>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary btn-large" id="submit-btn">Перейти к оплате</button>
+                </div>
+
+            </form>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 WeToo. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script src="api.js"></script>
+    <script src="checkout.js"></script>
+</body>
+</html>
