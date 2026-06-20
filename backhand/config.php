@@ -7,7 +7,7 @@
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'wetoo');
 define('DB_USER', 'wetoo_user');
-define('DB_PASS', 'G7kL9mR2qW4nX8pZ');
+define('DB_PASS', 'Elina180612');
 
 // ===== 2. JWT =====
 define('JWT_SECRET', 'xK9mN7pR3vW5qL2yT8fJ4bE6sH1uC0oA9gM6zN3vW5qL2yT8fJ4bE6sH1uC0o');
