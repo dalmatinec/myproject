@@ -1,11 +1,11 @@
 <?php
 // =============================================
-// WeToo - News API
+// WeToo - News API (Production — Webhook Only)
 // =============================================
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -17,7 +17,7 @@ require_once 'config.php';
 $method = $_SERVER['REQUEST_METHOD'];
 
 // =============================================
-// Надежный роутинг через REQUEST_URI
+// Роутинг через REQUEST_URI
 // =============================================
 $uri = $_SERVER['REQUEST_URI'] ?? '/';
 $path = parse_url($uri, PHP_URL_PATH);
@@ -26,9 +26,6 @@ if (empty($path)) {
     $path = '/';
 }
 
-// =============================================
-// Роутер
-// =============================================
 switch ($path) {
     case '/':
         if ($method === 'GET') {
@@ -39,9 +36,10 @@ switch ($path) {
         }
         break;
     
-    case '/sync':
+    case '/webhook':
+        // Только POST для Telegram Webhook
         if ($method === 'POST') {
-            handleSync($pdo);
+            handleWebhook($pdo);
         } else {
             http_response_code(405);
             echo json_encode(['error' => 'Method not allowed']);
@@ -67,17 +65,9 @@ switch ($path) {
 }
 
 // =============================================
-// Обработчики
+// ПОЛУЧЕНИЕ НОВОСТЕЙ (ПУБЛИЧНЫЙ API)
 // =============================================
 
-/**
- * GET /api/news/
- * Получение списка новостей (публичный)
- * 
- * Query параметры:
- * - limit: int (default 10)
- * - page: int (default 1)
- */
 function handleGetList($pdo) {
     $params = $_GET;
     $page = max(1, (int)($params['page'] ?? 1));
@@ -85,11 +75,9 @@ function handleGetList($pdo) {
     $offset = ($page - 1) * $limit;
     
     try {
-        // Счетчик
         $countStmt = $pdo->query("SELECT COUNT(*) as total FROM news");
         $total = $countStmt->fetch()['total'];
         
-        // Основной запрос
         $stmt = $pdo->prepare("
             SELECT id, slug, title, content, image_url, telegram_url, published_at, created_at
             FROM news
@@ -110,14 +98,10 @@ function handleGetList($pdo) {
         ]);
     } catch (Exception $e) {
         http_response_code(500);
-        echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
+        echo json_encode(['error' => 'Database error']);
     }
 }
 
-/**
- * GET /api/news/{id}
- * Получение одной новости (публичный)
- */
 function handleGetOne($pdo, $id) {
     try {
         $stmt = $pdo->prepare("
@@ -137,150 +121,143 @@ function handleGetOne($pdo, $id) {
         echo json_encode($news);
     } catch (Exception $e) {
         http_response_code(500);
-        echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
+        echo json_encode(['error' => 'Database error']);
     }
 }
 
-/**
- * POST /api/news/sync
- * Синхронизация новостей из Telegram канала (только для админа)
- * 
- * Запускается по cron: php /path/to/backend/news.php/sync
- * Или вручную через админку
- */
-function handleSync($pdo) {
-    // Проверяем, что запрос пришел от админа (если через HTTP)
-    // Если запуск через cron, можно разрешить без авторизации
-    $payload = null;
-    try {
-        $payload = requireAdmin($pdo);
-        if (!$payload) {
-            // Если через cron, токена нет — но мы разрешаем
-            // Проверяем, что это CLI-запрос
-            if (php_sapi_name() !== 'cli') {
-                return;
-            }
-        }
-    } catch (Exception $e) {
-        // Для cron-запросов без авторизации
-        if (php_sapi_name() !== 'cli') {
-            http_response_code(401);
-            echo json_encode(['error' => 'Unauthorized']);
-            return;
-        }
+// =============================================
+// WEBHOOK — ЕДИНСТВЕННЫЙ СПОСОБ ПОЛУЧЕНИЯ НОВОСТЕЙ
+// =============================================
+
+function handleWebhook($pdo) {
+    // 1. Проверяем, что запрос от Telegram
+    $input = file_get_contents('php://input');
+    if (empty($input)) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Empty request']);
+        return;
     }
     
+    $data = json_decode($input, true);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Invalid JSON']);
+        return;
+    }
+    
+    // 2. Проверяем наличие channel_post
+    if (!isset($data['channel_post'])) {
+        http_response_code(200);
+        echo json_encode(['status' => 'ignored']);
+        return;
+    }
+    
+    // 3. Получаем настройки
+    $settings = getSettings($pdo);
+    $botToken = $settings['telegram_bot_token'] ?? '';
+    $channelUsername = $settings['telegram_channel_username'] ?? '';
+    
+    if (empty($botToken)) {
+        http_response_code(500);
+        echo json_encode(['error' => 'Bot token not configured']);
+        return;
+    }
+    
+    $post = $data['channel_post'];
+    $telegramPostId = $post['message_id'];
+    $chatId = $post['chat']['id'] ?? 0;
+    $chatUsername = $post['chat']['username'] ?? '';
+    
+    // 4. Проверяем, что пост из нашего канала
+    if (!empty($channelUsername) && $chatUsername !== ltrim($channelUsername, '@')) {
+        http_response_code(200);
+        echo json_encode(['status' => 'ignored_wrong_channel']);
+        return;
+    }
+    
+    // 5. Защита от дублей (Telegram может дублировать webhook-запросы)
     try {
-        $settings = getSettings($pdo);
-        $channelUsername = $settings['telegram_channel_username'] ?? '';
-        $botToken = $settings['telegram_bot_token'] ?? '';
-        $siteUrl = $settings['site_url'] ?? '';
-        
-        if (empty($channelUsername) || empty($botToken)) {
-            http_response_code(400);
-            echo json_encode(['error' => 'Telegram channel or bot token not configured']);
+        $stmt = $pdo->prepare("SELECT id FROM news WHERE telegram_post_id = ?");
+        $stmt->execute([$telegramPostId]);
+        if ($stmt->fetch()) {
+            http_response_code(200);
+            echo json_encode(['status' => 'duplicate']);
             return;
         }
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['error' => 'Database error']);
+        return;
+    }
+    
+    // 6. Сохраняем новость
+    try {
+        $text = $post['text'] ?? $post['caption'] ?? '';
         
-        // Получаем последние посты из канала через Telegram API
-        $apiUrl = "https://api.telegram.org/bot{$botToken}/getUpdates";
-        $response = file_get_contents($apiUrl);
-        if (!$response) {
-            throw new Exception('Failed to fetch from Telegram API');
-        }
+        // Первая строка — заголовок, остальное — текст
+        $lines = explode("\n", $text);
+        $title = $lines[0] ?? 'Новость';
+        $content = $text;
         
-        $data = json_decode($response, true);
-        if (!$data || !isset($data['ok']) || !$data['ok']) {
-            throw new Exception('Telegram API error: ' . ($data['description'] ?? 'Unknown error'));
-        }
+        $telegramUrl = "https://t.me/{$chatUsername}/{$telegramPostId}";
         
-        $saved = 0;
-        $skipped = 0;
-        
-        // Обрабатываем обновления
-        foreach ($data['result'] as $update) {
-            // Проверяем наличие поста в канале
-            if (isset($update['channel_post'])) {
-                $post = $update['channel_post'];
-                $telegramPostId = $post['message_id'];
-                
-                // Проверяем, существует ли уже пост
-                $stmt = $pdo->prepare("SELECT id FROM news WHERE telegram_post_id = ?");
-                $stmt->execute([$telegramPostId]);
-                if ($stmt->fetch()) {
-                    $skipped++;
-                    continue;
+        // 7. Обработка изображения
+        $imageUrl = null;
+        if (isset($post['photo']) && !empty($post['photo'])) {
+            $photo = end($post['photo']);
+            $fileId = $photo['file_id'];
+            
+            $fileUrl = "https://api.telegram.org/bot{$botToken}/getFile?file_id={$fileId}";
+            $fileResponse = @file_get_contents($fileUrl);
+            if ($fileResponse) {
+                $fileData = json_decode($fileResponse, true);
+                if ($fileData && isset($fileData['ok']) && $fileData['ok'] && isset($fileData['result']['file_path'])) {
+                    $imageUrl = "https://api.telegram.org/file/bot{$botToken}/" . $fileData['result']['file_path'];
                 }
-                
-                // Извлекаем текст и фото
-                $text = $post['text'] ?? $post['caption'] ?? '';
-                $title = explode("\n", $text)[0] ?? 'Новость';
-                $content = $text;
-                
-                $imageUrl = null;
-                $telegramUrl = "https://t.me/{$channelUsername}/{$telegramPostId}";
-                
-                // Проверяем наличие фото
-                if (isset($post['photo']) && !empty($post['photo'])) {
-                    $photo = end($post['photo']);
-                    $fileId = $photo['file_id'];
-                    
-                    // Получаем ссылку на файл
-                    $fileUrl = "https://api.telegram.org/bot{$botToken}/getFile?file_id={$fileId}";
-                    $fileResponse = file_get_contents($fileUrl);
-                    $fileData = json_decode($fileResponse, true);
-                    
-                    if ($fileData && isset($fileData['result']['file_path'])) {
-                        $imageUrl = "https://api.telegram.org/file/bot{$botToken}/" . $fileData['result']['file_path'];
-                    }
-                }
-                
-                // Генерируем slug
-                $slug = generateSlug($title);
-                // Проверяем уникальность slug
-                $stmt = $pdo->prepare("SELECT id FROM news WHERE slug = ?");
-                $stmt->execute([$slug]);
-                if ($stmt->fetch()) {
-                    $slug = $slug . '-' . $telegramPostId;
-                }
-                
-                // Сохраняем новость
-                $publishedAt = date('Y-m-d H:i:s', $post['date'] ?? time());
-                $stmt = $pdo->prepare("
-                    INSERT INTO news (telegram_post_id, slug, title, content, image_url, telegram_url, published_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
-                ");
-                $stmt->execute([
-                    $telegramPostId,
-                    $slug,
-                    $title,
-                    $content,
-                    $imageUrl,
-                    $telegramUrl,
-                    $publishedAt
-                ]);
-                
-                $saved++;
             }
         }
         
+        // 8. Генерация slug
+        $slug = generateSlug($title);
+        $stmt = $pdo->prepare("SELECT id FROM news WHERE slug = ?");
+        $stmt->execute([$slug]);
+        if ($stmt->fetch()) {
+            $slug = $slug . '-' . $telegramPostId;
+        }
+        
+        // 9. Сохраняем в БД
+        $publishedAt = date('Y-m-d H:i:s', $post['date'] ?? time());
+        $stmt = $pdo->prepare("
+            INSERT INTO news (telegram_post_id, slug, title, content, image_url, telegram_url, published_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ");
+        $stmt->execute([
+            $telegramPostId,
+            $slug,
+            $title,
+            $content,
+            $imageUrl,
+            $telegramUrl,
+            $publishedAt
+        ]);
+        
+        // 10. Возвращаем успех Telegram
+        http_response_code(200);
         echo json_encode([
-            'success' => true,
-            'saved' => $saved,
-            'skipped' => $skipped,
-            'message' => "Saved {$saved} new posts, skipped {$skipped} duplicates"
+            'status' => 'success',
+            'id' => $pdo->lastInsertId()
         ]);
         
     } catch (Exception $e) {
         http_response_code(500);
-        echo json_encode(['error' => 'Sync error: ' . $e->getMessage()]);
+        echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
     }
 }
 
-/**
- * DELETE /api/news/{id}
- * Удаление новости (только для админа)
- */
+// =============================================
+// УДАЛЕНИЕ НОВОСТИ (АДМИН)
+// =============================================
+
 function handleDelete($pdo, $id) {
     $payload = requireAdmin($pdo);
     if (!$payload) return;
@@ -298,6 +275,6 @@ function handleDelete($pdo, $id) {
         echo json_encode(['success' => true]);
     } catch (Exception $e) {
         http_response_code(500);
-        echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
+        echo json_encode(['error' => 'Database error']);
     }
 }
