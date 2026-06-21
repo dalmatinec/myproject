@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Анкета отправлена — WeToo</title>
+    <meta name="description" content="Ваша анкета отправлена на модерацию" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="container header-inner">
+            <div class="logo">
+                <a href="index.html">WeToo</a>
+            </div>
+            <button class="burger" id="burgerBtn" aria-label="Меню">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="nav" id="mainNav">
+                <ul>
+                    <li><a href="index.html">Главная</a></li>
+                    <li><a href="profiles.html">Анкеты</a></li>
+                    <li><a href="news.html">Новости</a></li>
+                    <li><a href="contacts.html">Контакты</a></li>
+                    <li><a href="about.html">О нас</a></li>
+                </ul>
+                <a href="add-profile.html" class="btn btn-primary btn-sm">➕ Подать анкету</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ===== УСПЕХ ===== -->
+    <section class="success-page">
+        <div class="container">
+            <div class="success-card">
+                <div class="success-icon">✅</div>
+                <h1>Анкета отправлена на модерацию!</h1>
+                <p class="subtitle">Спасибо! Ваша анкета успешно создана и ожидает проверки.</p>
+
+                <div class="success-details" id="successDetails">
+                    <div class="detail-row">
+                        <span class="detail-label">Статус</span>
+                        <span class="detail-value" style="color:#F1C40F;">⏳ Ожидает модерации</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Анкета</span>
+                        <span class="detail-value" id="successProfileName">Загрузка...</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Тариф</span>
+                        <span class="detail-value" id="successPlanName">Загрузка...</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Платеж</span>
+                        <span class="detail-value" id="successPaymentId">#---</span>
+                    </div>
+                    <div class="detail-row" style="border-bottom: none;">
+                        <span class="detail-label">Уведомление</span>
+                        <span class="detail-value" style="font-size:14px;color:var(--text-secondary);">
+                            📱 Мы уведомим вас в Telegram,<br />когда анкета будет опубликована.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="success-actions">
+                    <a href="index.html" class="btn btn-secondary">🏠 На главную</a>
+                    <a href="profiles.html" class="btn btn-primary">👤 Смотреть анкеты</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="container footer-inner">
+            <div class="footer-brand">
+                <div class="logo">WeToo</div>
+                <p>Платформа проверенных анкет</p>
+            </div>
+            <div class="footer-links">
+                <a href="index.html">Главная</a>
+                <a href="profiles.html">Анкеты</a>
+                <a href="news.html">Новости</a>
+                <a href="contacts.html">Контакты</a>
+                <a href="about.html">О нас</a>
+            </div>
+            <div class="footer-copy">
+                © 2026 WeToo. Все права защищены.
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets.js"></script>
+    <script>
+        (function() {
+            'use strict';
+
+            const profileName = document.getElementById('successProfileName');
+            const planName = document.getElementById('successPlanName');
+            const paymentId = document.getElementById('successPaymentId');
+
+            // ===== ПАРСИМ URL =====
+            function getParam(name) {
+                const params = new URLSearchParams(window.location.search);
+                return params.get(name);
+            }
+
+            const paymentIdValue = getParam('payment_id');
+            const profileId = getParam('profile_id');
+
+            if (paymentIdValue) {
+                paymentId.textContent = '#' + paymentIdValue;
+            } else {
+                paymentId.textContent = '—';
+            }
+
+            // ===== ЗАГРУЗКА ДАННЫХ АНКЕТЫ =====
+            async function loadProfile() {
+                let id = profileId;
+
+                // Если нет profile_id в URL, пробуем получить через платеж
+                if (!id && paymentIdValue) {
+                    try {
+                        const payment = await apiFetch('/payments/' + paymentIdValue);
+                        id = payment.profile_id;
+                    } catch (error) {
+                        console.error('Ошибка загрузки платежа:', error);
+                        profileName.textContent = 'Не удалось загрузить';
+                        planName.textContent = '—';
+                        return;
+                    }
+                }
+
+                if (!id) {
+                    profileName.textContent = '—';
+                    planName.textContent = '—';
+                    return;
+                }
+
+                try {
+                    const profile = await apiFetch('/profiles/' + id);
+                    profileName.textContent = profile.name + ', ' + profile.age + ' лет, ' + (profile.city_name || 'город не указан');
+                    planName.textContent = profile.plan_name || 'Неизвестный тариф';
+                } catch (error) {
+                    console.error('Ошибка загрузки анкеты:', error);
+                    profileName.textContent = 'Не удалось загрузить';
+                    planName.textContent = '—';
+                }
+            }
+
+            // ===== ИНИЦИАЛИЗАЦИЯ =====
+            document.addEventListener('DOMContentLoaded', function() {
+                initBurger();
+                loadProfile();
+            });
+
+        })();
+    </script>
+</body>
+</html>
