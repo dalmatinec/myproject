@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WeToo — Платформа проверенных анкет</title>
+    <meta name="description" content="Платформа проверенных анкет. Найди проверенных специалистов в своем городе." />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="container header-inner">
+            <div class="logo">
+                <a href="index.html">WeToo</a>
+            </div>
+            <button class="burger" id="burgerBtn" aria-label="Меню">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="nav" id="mainNav">
+                <ul>
+                    <li><a href="index.html" class="active">Главная</a></li>
+                    <li><a href="profiles.html">Анкеты</a></li>
+                    <li><a href="news.html">Новости</a></li>
+                    <li><a href="contacts.html">Контакты</a></li>
+                    <li><a href="about.html">О нас</a></li>
+                </ul>
+                <a href="add-profile.html" class="btn btn-primary btn-sm">➕ Подать анкету</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ===== HERO ===== -->
+    <section class="hero">
+        <div class="container hero-inner">
+            <h1 class="hero-title">WeToo</h1>
+            <p class="hero-subtitle">Платформа проверенных анкет</p>
+            <p class="hero-description">Найди проверенных специалистов в своем городе</p>
+            <a href="add-profile.html" class="btn btn-primary btn-lg">➕ Подать анкету</a>
+
+            <!-- Поиск по городам -->
+            <div class="hero-search">
+                <select id="heroCitySearch" class="hero-search-select">
+                    <option value="">Все города</option>
+                </select>
+                <button class="btn btn-secondary" id="heroSearchBtn">🔍 Найти</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== VIP КАРУСЕЛЬ ===== -->
+    <section class="vip-section">
+        <div class="container">
+            <h2 class="section-title">⭐ VIP анкеты</h2>
+
+            <div class="carousel-container" id="vipCarousel">
+                <div class="carousel-track" id="carouselTrack">
+                    <!-- Загружается через JS -->
+                </div>
+
+                <button class="carousel-btn carousel-btn-prev" id="carouselPrev">‹</button>
+                <button class="carousel-btn carousel-btn-next" id="carouselNext">›</button>
+            </div>
+
+            <div class="carousel-dots" id="carouselDots">
+                <!-- Генерируются через JS -->
+            </div>
+
+            <!-- Если нет VIP анкет -->
+            <div class="vip-empty" id="vipEmpty" style="display:none;">
+                <div class="vip-empty-icon">🌟</div>
+                <h3>Пока нет VIP анкет</h3>
+                <p>Стань первым! Создай анкету с VIP-тарифом.</p>
+                <a href="add-profile.html" class="btn btn-primary">Создать анкету</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== КАК ЭТО РАБОТАЕТ ===== -->
+    <section class="how-it-works">
+        <div class="container">
+            <h2 class="section-title">Как это работает</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">📝</div>
+                    <h3>Создай анкету</h3>
+                    <p>Заполни информацию о себе, загрузи фото и выбери тариф</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">💰</div>
+                    <h3>Оплати криптовалютой</h3>
+                    <p>Оплати размещение BTC, ETH или USDT</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">✅</div>
+                    <h3>Пройди модерацию</h3>
+                    <p>Администратор проверит анкету и опубликует</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="container footer-inner">
+            <div class="footer-brand">
+                <div class="logo">WeToo</div>
+                <p>Платформа проверенных анкет</p>
+            </div>
+            <div class="footer-links">
+                <a href="index.html">Главная</a>
+                <a href="profiles.html">Анкеты</a>
+                <a href="news.html">Новости</a>
+                <a href="contacts.html">Контакты</a>
+                <a href="about.html">О нас</a>
+            </div>
+            <div class="footer-copy">
+                © 2026 WeToo. Все права защищены.
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===== МОДАЛЬНОЕ ОКНО АНКЕТЫ ===== -->
+    <div class="modal-overlay" id="profileModal">
+        <div class="modal">
+            <button class="modal-close" id="modalClose">✕</button>
+            <div class="modal-body" id="modalBody">
+                <!-- Загружается через JS -->
+            </div>
+        </div>
+    </div>
+
+    <script src="assets.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCitiesForSearch();
+            loadVipProfiles();
+            initBurger();
+            initModal();
+
+            document.getElementById('heroSearchBtn').addEventListener('click', function() {
+                const cityId = document.getElementById('heroCitySearch').value;
+                window.location.href = cityId ? 'profiles.html?city=' + cityId : 'profiles.html';
+            });
+        });
+
+        function loadCitiesForSearch() {
+            fetch('/api/profiles/cities')
+                .then(res => res.json())
+                .then(cities => {
+                    const select = document.getElementById('heroCitySearch');
+                    cities.forEach(city => {
+                        const option = document.createElement('option');
+                        option.value = city.id;
+                        option.textContent = city.name;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(() => {});
+        }
+
+        function loadVipProfiles() {
+            const track = document.getElementById('carouselTrack');
+            const dots = document.getElementById('carouselDots');
+            const empty = document.getElementById('vipEmpty');
+
+            fetch('/api/profiles?vip=1&limit=20')
+                .then(res => res.json())
+                .then(data => {
+                    const profiles = data.data || [];
+                    if (profiles.length === 0) {
+                        track.style.display = 'none';
+                        document.querySelector('.carousel-container').style.display = 'none';
+                        empty.style.display = 'block';
+                        return;
+                    }
+                    empty.style.display = 'none';
+                    renderVipCarousel(profiles);
+                })
+                .catch(() => {
+                    empty.style.display = 'block';
+                });
+        }
+
+        function renderVipCarousel(profiles) {
+            const track = document.getElementById('carouselTrack');
+            const dots = document.getElementById('carouselDots');
+            track.innerHTML = '';
+            dots.innerHTML = '';
+
+            profiles.forEach((profile, index) => {
+                const card = document.createElement('div');
+                card.className = 'carousel-slide' + (index === 0 ? ' active' : '');
+                card.dataset.index = index;
+
+                const photo = profile.photo_urls && profile.photo_urls.length > 0
+                    ? '/images/' + profile.photo_urls[0]
+                    : '/images/default-avatar.png';
+
+                card.innerHTML = `
+                    <div class="carousel-card">
+                        <img src="${photo}" alt="${profile.name}" class="carousel-card-img" />
+                        <div class="carousel-card-body">
+                            <h3 class="carousel-card-name">${profile.name}, ${profile.age}</h3>
+                            <p class="carousel-card-city">${profile.city_name || 'Город не указан'}</p>
+                            <p class="carousel-card-desc">${profile.description ? profile.description.substring(0, 80) + '...' : ''}</p>
+                            ${profile.price ? `<p class="carousel-card-price">от ${profile.price} ₽</p>` : ''}
+                            <button class="btn btn-primary btn-sm" onclick="openProfileModal(${profile.id})">Подробнее</button>
+                        </div>
+                    </div>
+                `;
+                track.appendChild(card);
+
+                const dot = document.createElement('span');
+                dot.className = 'carousel-dot' + (index === 0 ? ' active' : '');
+                dot.dataset.index = index;
+                dot.addEventListener('click', () => goToSlide(index));
+                dots.appendChild(dot);
+            });
+
+            let currentIndex = 0;
+            let autoPlayInterval = null;
+
+            document.getElementById('carouselPrev').addEventListener('click', () => {
+                goToSlide(currentIndex - 1);
+                resetAutoPlay();
+            });
+            document.getElementById('carouselNext').addEventListener('click', () => {
+                goToSlide(currentIndex + 1);
+                resetAutoPlay();
+            });
+
+            document.querySelectorAll('.carousel-slide').forEach(slide => {
+                slide.addEventListener('click', () => resetAutoPlay());
+            });
+
+            function goToSlide(index) {
+                const slides = document.querySelectorAll('.carousel-slide');
+                const dots = document.querySelectorAll('.carousel-dot');
+                if (index < 0) index = slides.length - 1;
+                if (index >= slides.length) index = 0;
+                slides.forEach((s, i) => {
+                    s.classList.toggle('active', i === index);
+                    s.style.transform = 'translateX(' + ((i - index) * 100) + '%)';
+                });
+                dots.forEach((d, i) => {
+                    d.classList.toggle('active', i === index);
+                });
+                currentIndex = index;
+            }
+
+            function resetAutoPlay() {
+                if (autoPlayInterval) {
+                    clearInterval(autoPlayInterval);
+                    autoPlayInterval = null;
+                }
+            }
+
+            function startAutoPlay() {
+                autoPlayInterval = setInterval(() => {
+                    goToSlide(currentIndex + 1);
+                }, 4000);
+            }
+
+            goToSlide(0);
+            setTimeout(startAutoPlay, 3000);
+        }
+
+        function initBurger() {
+            const burger = document.getElementById('burgerBtn');
+            const nav = document.getElementById('mainNav');
+            burger.addEventListener('click', () => {
+                nav.classList.toggle('open');
+                burger.classList.toggle('active');
+            });
+        }
+
+        function initModal() {
+            const modal = document.getElementById('profileModal');
+            const close = document.getElementById('modalClose');
+            close.addEventListener('click', () => modal.classList.remove('open'));
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.classList.remove('open');
+            });
+        }
+
+        function openProfileModal(id) {
+            const modal = document.getElementById('profileModal');
+            const body = document.getElementById('modalBody');
+            body.innerHTML = '<p style="text-align:center;">Загрузка...</p>';
+            modal.classList.add('open');
+
+            fetch('/api/profiles/' + id)
+                .then(res => res.json())
+                .then(profile => {
+                    const photos = profile.photo_urls && profile.photo_urls.length > 0
+                        ? profile.photo_urls.map(url => `<img src="/images/${url}" alt="Фото" />`).join('')
+                        : '<p>Нет фото</p>';
+                    body.innerHTML = `
+                        <div class="modal-profile">
+                            <div class="modal-photos">${photos}</div>
+                            <h2>${profile.name}, ${profile.age}</h2>
+                            <p><strong>Город:</strong> ${profile.city_name || 'Не указан'}</p>
+                            <p><strong>Описание:</strong> ${profile.description || ''}</p>
+                            ${profile.price ? `<p><strong>Цена:</strong> от ${profile.price} ₽</p>` : ''}
+                            <p><strong>Telegram:</strong> <a href="https://t.me/${profile.telegram.replace('@', '')}" target="_blank">${profile.telegram}</a></p>
+                            ${profile.whatsapp ? `<p><strong>WhatsApp:</strong> <a href="https://wa.me/${profile.whatsapp.replace(/[^0-9]/g, '')}" target="_blank">${profile.whatsapp}</a></p>` : ''}
+                            <a href="https://t.me/${profile.telegram.replace('@', '')}" target="_blank" class="btn btn-primary">💬 Связаться</a>
+                        </div>
+                    `;
+                })
+                .catch(() => {
+                    body.innerHTML = '<p style="text-align:center;color:red;">Ошибка загрузки анкеты</p>';
+                });
+        }
+
+        // Глобально для onclick в HTML
+        window.openProfileModal = openProfileModal;
+    </script>
+</body>
+</html>
