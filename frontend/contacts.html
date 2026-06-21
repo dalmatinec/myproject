@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Контакты — WeToo</title>
+    <meta name="description" content="Контакты платформы WeToo" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="container header-inner">
+            <div class="logo">
+                <a href="index.html">WeToo</a>
+            </div>
+            <button class="burger" id="burgerBtn" aria-label="Меню">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="nav" id="mainNav">
+                <ul>
+                    <li><a href="index.html">Главная</a></li>
+                    <li><a href="profiles.html">Анкеты</a></li>
+                    <li><a href="news.html">Новости</a></li>
+                    <li><a href="contacts.html" class="active">Контакты</a></li>
+                    <li><a href="about.html">О нас</a></li>
+                </ul>
+                <a href="add-profile.html" class="btn btn-primary btn-sm">➕ Подать анкету</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ===== КОНТАКТЫ ===== -->
+    <section class="contacts-page">
+        <div class="container">
+            <div class="contacts-card">
+                <h1>📞 Контакты</h1>
+                <p class="subtitle">Свяжитесь с нами любым удобным способом</p>
+
+                <!-- Поддержка -->
+                <div class="contact-item" id="contactSupport">
+                    <div class="contact-icon">💬</div>
+                    <div class="contact-info">
+                        <div class="label">Поддержка</div>
+                        <div class="value" id="supportUsername">Загрузка...</div>
+                    </div>
+                    <a href="#" id="supportLink" class="btn btn-primary btn-sm contact-btn" target="_blank">Написать</a>
+                </div>
+
+                <!-- Новостной канал -->
+                <div class="contact-item" id="contactChannel">
+                    <div class="contact-icon">📰</div>
+                    <div class="contact-info">
+                        <div class="label">Новостной канал</div>
+                        <div class="value" id="channelUsername">Загрузка...</div>
+                    </div>
+                    <a href="#" id="channelLink" class="btn btn-secondary btn-sm contact-btn" target="_blank">Подписаться</a>
+                </div>
+
+                <!-- Обменник -->
+                <div class="contact-item" id="contactExchange">
+                    <div class="contact-icon">💱</div>
+                    <div class="contact-info">
+                        <div class="label">Помощь с обменом криптовалюты</div>
+                        <div class="value" id="exchangeUsername">Загрузка...</div>
+                    </div>
+                    <a href="#" id="exchangeLink" class="btn btn-primary btn-sm contact-btn" target="_blank">Связаться</a>
+                </div>
+
+                <!-- Email (если есть в настройках) -->
+                <div class="contact-item" id="contactEmail" style="display:none;">
+                    <div class="contact-icon">📧</div>
+                    <div class="contact-info">
+                        <div class="label">Email</div>
+                        <div class="value" id="emailValue">—</div>
+                    </div>
+                    <a href="#" id="emailLink" class="btn btn-secondary btn-sm contact-btn" target="_blank">Написать</a>
+                </div>
+
+                <div style="margin-top:24px;padding:16px;background:var(--bg);border-radius:var(--radius-sm);text-align:center;color:var(--text-secondary);font-size:14px;">
+                    📱 Все контакты обновляются автоматически из настроек сайта
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="container footer-inner">
+            <div class="footer-brand">
+                <div class="logo">WeToo</div>
+                <p>Платформа проверенных анкет</p>
+            </div>
+            <div class="footer-links">
+                <a href="index.html">Главная</a>
+                <a href="profiles.html">Анкеты</a>
+                <a href="news.html">Новости</a>
+                <a href="contacts.html">Контакты</a>
+                <a href="about.html">О нас</a>
+            </div>
+            <div class="footer-copy">
+                © 2026 WeToo. Все права защищены.
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets.js"></script>
+    <script>
+        (function() {
+            'use strict';
+
+            const supportUsername = document.getElementById('supportUsername');
+            const supportLink = document.getElementById('supportLink');
+            const channelUsername = document.getElementById('channelUsername');
+            const channelLink = document.getElementById('channelLink');
+            const exchangeUsername = document.getElementById('exchangeUsername');
+            const exchangeLink = document.getElementById('exchangeLink');
+            const emailValue = document.getElementById('emailValue');
+            const emailLink = document.getElementById('emailLink');
+            const contactEmail = document.getElementById('contactEmail');
+
+            // ===== ЗАГРУЗКА НАСТРОЕК =====
+            async function loadContacts() {
+                try {
+                    const settings = await apiFetch('/admin/settings');
+
+                    // Поддержка
+                    const support = settings.telegram_support_username || '';
+                    if (support) {
+                        supportUsername.textContent = '@' + support.replace('@', '');
+                        supportLink.href = 'https://t.me/' + support.replace('@', '');
+                        supportLink.textContent = '💬 Написать';
+                    } else {
+                        supportUsername.textContent = 'Не настроен';
+                        supportLink.href = '#';
+                        supportLink.textContent = '—';
+                        supportLink.style.opacity = '0.5';
+                        supportLink.style.cursor = 'default';
+                    }
+
+                    // Канал
+                    const channel = settings.telegram_channel_username || '';
+                    if (channel) {
+                        channelUsername.textContent = '@' + channel.replace('@', '');
+                        channelLink.href = 'https://t.me/' + channel.replace('@', '');
+                        channelLink.textContent = '📰 Подписаться';
+                    } else {
+                        channelUsername.textContent = 'Не настроен';
+                        channelLink.href = '#';
+                        channelLink.textContent = '—';
+                        channelLink.style.opacity = '0.5';
+                        channelLink.style.cursor = 'default';
+                    }
+
+                    // Обменник
+                    const exchange = settings.telegram_exchange_username || '';
+                    if (exchange) {
+                        exchangeUsername.textContent = '@' + exchange.replace('@', '');
+                        exchangeLink.href = 'https://t.me/' + exchange.replace('@', '');
+                        exchangeLink.textContent = '💱 Написать';
+                    } else {
+                        exchangeUsername.textContent = 'Не настроен';
+                        exchangeLink.href = '#';
+                        exchangeLink.textContent = '—';
+                        exchangeLink.style.opacity = '0.5';
+                        exchangeLink.style.cursor = 'default';
+                    }
+
+                    // Email (если добавится в будущем)
+                    // Можно оставить скрытым, так как в текущей схеме нет email в settings
+                    contactEmail.style.display = 'none';
+
+                } catch (error) {
+                    console.error('Ошибка загрузки контактов:', error);
+                    supportUsername.textContent = '❌ Ошибка';
+                    channelUsername.textContent = '❌ Ошибка';
+                    exchangeUsername.textContent = '❌ Ошибка';
+                }
+            }
+
+            // ===== ИНИЦИАЛИЗАЦИЯ =====
+            document.addEventListener('DOMContentLoaded', function() {
+                initBurger();
+                loadContacts();
+            });
+
+        })();
+    </script>
+</body>
+</html>
