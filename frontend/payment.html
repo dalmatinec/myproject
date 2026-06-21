@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Оплата — WeToo</title>
+    <meta name="description" content="Оплата размещения анкеты криптовалютой" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="container header-inner">
+            <div class="logo">
+                <a href="index.html">WeToo</a>
+            </div>
+            <button class="burger" id="burgerBtn" aria-label="Меню">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="nav" id="mainNav">
+                <ul>
+                    <li><a href="index.html">Главная</a></li>
+                    <li><a href="profiles.html">Анкеты</a></li>
+                    <li><a href="news.html">Новости</a></li>
+                    <li><a href="contacts.html">Контакты</a></li>
+                    <li><a href="about.html">О нас</a></li>
+                </ul>
+                <a href="add-profile.html" class="btn btn-primary btn-sm">➕ Подать анкету</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ===== ОПЛАТА ===== -->
+    <section class="payment-page">
+        <div class="container">
+            <div class="payment-card">
+                <h1>💰 Оплата размещения</h1>
+                <p class="subtitle">Оплатите анкету криптовалютой и отправьте на модерацию</p>
+
+                <!-- Информация об анкете -->
+                <div class="payment-profile-info" id="profileInfo">
+                    <div>
+                        <div class="label">Анкета</div>
+                        <div class="value" id="profileName">Загрузка...</div>
+                    </div>
+                    <div>
+                        <div class="label">Тариф</div>
+                        <div class="value" id="profilePlan">Загрузка...</div>
+                    </div>
+                    <div>
+                        <div class="label">Сумма</div>
+                        <div class="value" id="profileAmount">Загрузка...</div>
+                    </div>
+                </div>
+
+                <!-- Выбор валюты -->
+                <div class="currency-selector" id="currencySelector">
+                    <div class="currency-option" data-currency="BTC">
+                        <div class="currency-icon">₿</div>
+                        <div class="currency-name">BTC</div>
+                        <div class="currency-amount" id="btcAmount">—</div>
+                    </div>
+                    <div class="currency-option" data-currency="ETH">
+                        <div class="currency-icon">⟠</div>
+                        <div class="currency-name">ETH</div>
+                        <div class="currency-amount" id="ethAmount">—</div>
+                    </div>
+                    <div class="currency-option" data-currency="USDT">
+                        <div class="currency-icon">₮</div>
+                        <div class="currency-name">USDT</div>
+                        <div class="currency-amount" id="usdtAmount">—</div>
+                    </div>
+                </div>
+
+                <!-- Детали оплаты -->
+                <div class="payment-details" id="paymentDetails">
+                    <div class="detail-row">
+                        <span class="detail-label">Сумма</span>
+                        <span class="detail-value" id="detailAmount">—</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Кошелек</span>
+                        <span class="detail-value" id="detailWallet">
+                            <span id="walletAddress">—</span>
+                            <button class="copy-btn" id="copyWalletBtn" title="Скопировать адрес">📋</button>
+                        </span>
+                    </div>
+                    <div class="detail-row" style="border-bottom: none; padding-top:12px; margin-top:4px; border-top: 1px solid var(--border);">
+                        <span class="detail-label">Статус</span>
+                        <span class="detail-value" style="color:#F1C40F;">⏳ Ожидает оплаты</span>
+                    </div>
+                </div>
+
+                <!-- TXID -->
+                <div class="txid-input">
+                    <label>📝 Хэш транзакции (опционально)</label>
+                    <input type="text" id="txidInput" class="form-control" placeholder="0x123abc... или TXID" />
+                    <div class="hint" style="font-size:12px;color:var(--text-light);margin-top:4px;">Можете указать хэш транзакции для ускорения проверки</div>
+                </div>
+
+                <!-- Загрузка скриншота -->
+                <div class="screenshot-upload">
+                    <div class="file-upload-area" id="screenshotArea">
+                        <input type="file" id="screenshotInput" accept="image/*" />
+                        <div class="icon">📸</div>
+                        <div class="text">
+                            <strong>Загрузите скриншот оплаты</strong><br />
+                            <span style="font-size:12px;color:var(--text-light);">Поддерживаются JPG, PNG, WEBP</span>
+                        </div>
+                    </div>
+                    <div class="screenshot-preview" id="screenshotPreview">
+                        <img id="screenshotImg" src="" alt="Скриншот оплаты" />
+                    </div>
+                </div>
+
+                <!-- Блок обменника -->
+                <div class="exchange-block" id="exchangeBlock">
+                    <div class="exchange-icon">💱</div>
+                    <h4>Нет криптовалюты?</h4>
+                    <p>Мы поможем с обменом! Напишите нашему специалисту,<br />и мы обменяем ваши деньги на криптовалюту.</p>
+                    <a href="#" id="exchangeLink" class="btn btn-primary" target="_blank">💱 Помощь с обменом</a>
+                </div>
+
+                <!-- Кнопка отправки -->
+                <button class="btn btn-primary payment-submit" id="paymentSubmit" disabled>
+                    ✅ Оплатил, отправить на модерацию
+                </button>
+
+                <!-- Сообщение об ошибке -->
+                <div id="paymentError" style="display:none;margin-top:12px;padding:12px;background:#FDEDEC;color:#E74C3C;border-radius:var(--radius-sm);text-align:center;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="container footer-inner">
+            <div class="footer-brand">
+                <div class="logo">WeToo</div>
+                <p>Платформа проверенных анкет</p>
+            </div>
+            <div class="footer-links">
+                <a href="index.html">Главная</a>
+                <a href="profiles.html">Анкеты</a>
+                <a href="news.html">Новости</a>
+                <a href="contacts.html">Контакты</a>
+                <a href="about.html">О нас</a>
+            </div>
+            <div class="footer-copy">
+                © 2026 WeToo. Все права защищены.
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets.js"></script>
+    <script>
+        (function() {
+            'use strict';
+
+            const state = {
+                profileId: null,
+                planId: null,
+                planName: null,
+                prices: {},
+                selectedCurrency: null,
+                screenshotFile: null,
+                isSubmitting: false
+            };
+
+            const profileName = document.getElementById('profileName');
+            const profilePlan = document.getElementById('profilePlan');
+            const profileAmount = document.getElementById('profileAmount');
+            const currencyOptions = document.querySelectorAll('.currency-option');
+            const paymentDetails = document.getElementById('paymentDetails');
+            const detailAmount = document.getElementById('detailAmount');
+            const walletAddress = document.getElementById('walletAddress');
+            const copyWalletBtn = document.getElementById('copyWalletBtn');
+            const screenshotInput = document.getElementById('screenshotInput');
+            const screenshotPreview = document.getElementById('screenshotPreview');
+            const screenshotImg = document.getElementById('screenshotImg');
+            const txidInput = document.getElementById('txidInput');
+            const submitBtn = document.getElementById('paymentSubmit');
+            const paymentError = document.getElementById('paymentError');
+            const exchangeLink = document.getElementById('exchangeLink');
+
+            function getProfileId() {
+                const params = new URLSearchParams(window.location.search);
+                return params.get('profile_id');
+            }
+
+            async function loadProfile() {
+                const id = getProfileId();
+                if (!id) { showError('ID анкеты не указан'); return; }
+                state.profileId = parseInt(id);
+
+                try {
+                    const response = await fetch('/api/profiles/' + id);
+                    const profile = await response.json();
+                    if (!response.ok) throw new Error(profile.error || 'Анкета не найдена');
+                    if (profile.status !== 'pending') {
+                        throw new Error('Анкета уже обработана. Статус: ' + profile.status);
+                    }
+                    state.planId = profile.plan_id;
+                    state.planName = profile.plan_name || 'Неизвестный тариф';
+                    profileName.textContent = profile.name + ', ' + profile.age + ' лет, ' + (profile.city_name || 'город не указан');
+                    profilePlan.textContent = state.planName;
+                    await loadPlanPrices();
+                } catch (error) {
+                    console.error('Ошибка загрузки анкеты:', error);
+                    showError(error.message || 'Ошибка загрузки анкеты');
+                    submitBtn.disabled = true;
+                }
+            }
+
+            async function loadPlanPrices() {
+                try {
+                    const plans = await apiFetch('/profiles/plans');
+                    const plan = plans.find(p => p.id === state.planId);
+                    if (!plan) throw new Error('Тариф не найден');
+                    state.prices = { BTC: plan.price_btc || 0, ETH: plan.price_eth || 0, USDT: plan.price_usdt || 0 };
+                    document.getElementById('btcAmount').textContent = state.prices.BTC > 0 ? state.prices.BTC + ' BTC' : '—';
+                    document.getElementById('ethAmount').textContent = state.prices.ETH > 0 ? state.prices.ETH + ' ETH' : '—';
+                    document.getElementById('usdtAmount').textContent = state.prices.USDT > 0 ? state.prices.USDT + ' USDT' : '—';
+                    const total = Object.values(state.prices).reduce((sum, v) => sum + v, 0);
+                    profileAmount.textContent = total > 0 ? 'от ' + total + ' USDT' : '—';
+
+                    currencyOptions.forEach(opt => {
+                        const currency = opt.dataset.currency;
+                        const price = state.prices[currency] || 0;
+                        if (price > 0) { opt.style.opacity = '1';
+                            opt.style.cursor = 'pointer';
+                            opt.dataset.price = price; } else { opt.style.opacity = '0.4';
+                            opt.style.cursor = 'default';
+                            opt.dataset.price = '0'; }
+                    });
+
+                    const firstAvailable = document.querySelector('.currency-option[data-price]:not([data-price="0"])');
+                    if (firstAvailable) selectCurrency(firstAvailable);
+                } catch (error) {
+                    console.error('Ошибка загрузки тарифов:', error);
+                    showError('Ошибка загрузки цен тарифов');
+                }
+            }
+
+            function selectCurrency(element) {
+                const price = parseFloat(element.dataset.price);
+                if (!price || price <= 0) return;
+                currencyOptions.forEach(opt => opt.classList.remove('active'));
+                element.classList.add('active');
+                const currency = element.dataset.currency;
+                state.selectedCurrency = currency;
+                paymentDetails.classList.add('show');
+                detailAmount.textContent = price + ' ' + currency;
+                loadWalletAddress(currency);
+                submitBtn.disabled = !screenshotInput.files || screenshotInput.files.length === 0;
+            }
+
+            async function loadWalletAddress(currency) {
+                try {
+                    const settings = await apiFetch('/admin/settings');
+                    const key = currency.toLowerCase() + '_wallet';
+                    const address = settings[key] || '';
+                    if (address) {
+                        walletAddress.textContent = address;
+                        walletAddress.dataset.address = address;
+                        copyWalletBtn.style.display = 'inline-block';
+                    } else {
+                        walletAddress.textContent = '❌ Кошелек не настроен';
+                        walletAddress.dataset.address = '';
+                        copyWalletBtn.style.display = 'none';
+                        showError('Кошелек для ' + currency + ' не настроен в админке');
+                        submitBtn.disabled = true;
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки настроек:', error);
+                    walletAddress.textContent = '❌ Ошибка загрузки';
+                    walletAddress.dataset.address = '';
+                    copyWalletBtn.style.display = 'none';
+                }
+            }
+
+            copyWalletBtn.addEventListener('click', function() {
+                const address = walletAddress.dataset.address;
+                if (!address) return;
+                navigator.clipboard.writeText(address).then(() => {
+                    this.textContent = '✅';
+                    setTimeout(() => { this.textContent = '📋'; }, 2000);
+                }).catch(() => {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = address;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    this.textContent = '✅';
+                    setTimeout(() => { this.textContent = '📋'; }, 2000);
+                });
+            });
+
+            currencyOptions.forEach(opt => {
+                opt.addEventListener('click', function() {
+                    const price = parseFloat(this.dataset.price);
+                    if (!price || price <= 0) { showError('Этот способ оплаты недоступен'); return; }
+                    selectCurrency(this);
+                });
+            });
+
+            screenshotInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (!file) {
+                    screenshotPreview.classList.remove('show');
+                    state.screenshotFile = null;
+                    submitBtn.disabled = true;
+                    return;
+                }
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                if (!allowedTypes.includes(file.type)) {
+                    showError('Некорректный формат файла. Поддерживаются: JPG, PNG, GIF, WEBP');
+                    this.value = '';
+                    screenshotPreview.classList.remove('show');
+                    state.screenshotFile = null;
+                    submitBtn.disabled = true;
+                    return;
+                }
+                if (file.size > 5 * 1024 * 1024) {
+                    showError('Файл слишком большой. Максимум 5 МБ.');
+                    this.value = '';
+                    screenshotPreview.classList.remove('show');
+                    state.screenshotFile = null;
+                    submitBtn.disabled = true;
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    screenshotImg.src = e.target.result;
+                    screenshotPreview.classList.add('show');
+                };
+                reader.readAsDataURL(file);
+                state.screenshotFile = file;
+                submitBtn.disabled = !state.selectedCurrency || !state.screenshotFile;
+            });
+
+            submitBtn.addEventListener('click', async function(e) {
+                e.preventDefault();
+                if (state.isSubmitting) return;
+                if (!state.selectedCurrency) { showError('Выберите валюту оплаты'); return; }
+                if (!state.screenshotFile) { showError('Загрузите скриншот оплаты'); return; }
+
+                state.isSubmitting = true;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="loading-spinner"></span> Отправка...';
+                hideError();
+
+                const formData = new FormData();
+                formData.append('profile_id', state.profileId);
+                formData.append('plan_id', state.planId);
+                formData.append('currency', state.selectedCurrency);
+                formData.append('screenshot', state.screenshotFile);
+                if (txidInput.value.trim()) formData.append('txid', txidInput.value.trim());
+
+                try {
+                    const response = await fetch('/api/payments/create', { method: 'POST', body: formData });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error || 'Ошибка создания платежа');
+                    window.location.href = 'success.html?payment_id=' + result.id;
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    showError(error.message || 'Ошибка при отправке платежа');
+                    state.isSubmitting = false;
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '✅ Оплатил, отправить на модерацию';
+                }
+            });
+
+            async function loadExchangeSettings() {
+                try {
+                    const settings = await apiFetch('/admin/settings');
+                    const username = settings.telegram_exchange_username || '';
+                    if (username) {
+                        exchangeLink.href = 'https://t.me/' + username.replace('@', '');
+                    } else {
+                        exchangeLink.href = '#';
+                        exchangeLink.textContent = '💱 Обмен временно недоступен';
+                        exchangeLink.style.opacity = '0.6';
+                        exchangeLink.style.cursor = 'default';
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки настроек обменника:', error);
+                }
+            }
+
+            function showError(message) {
+                paymentError.textContent = message;
+                paymentError.style.display = 'block';
+            }
+
+            function hideError() {
+                paymentError.style.display = 'none';
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                initBurger();
+                loadProfile();
+                loadExchangeSettings();
+            });
+
+        })();
+    </script>
+</body>
+</html>
