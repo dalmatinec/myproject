@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>О нас — WeToo</title>
+    <meta name="description" content="О платформе WeToo" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="container header-inner">
+            <div class="logo">
+                <a href="index.html">WeToo</a>
+            </div>
+            <button class="burger" id="burgerBtn" aria-label="Меню">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="nav" id="mainNav">
+                <ul>
+                    <li><a href="index.html">Главная</a></li>
+                    <li><a href="profiles.html">Анкеты</a></li>
+                    <li><a href="news.html">Новости</a></li>
+                    <li><a href="contacts.html">Контакты</a></li>
+                    <li><a href="about.html" class="active">О нас</a></li>
+                </ul>
+                <a href="add-profile.html" class="btn btn-primary btn-sm">➕ Подать анкету</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ===== О НАС ===== -->
+    <section class="about-page">
+        <div class="container">
+            <div class="about-card">
+                <h1>❓ О нас</h1>
+                <p class="subtitle">Платформа проверенных анкет</p>
+
+                <div class="about-text">
+                    <h2>WeToo — платформа проверенных анкет</h2>
+                    <p>
+                        Мы помогаем людям находить проверенных специалистов в своем городе.
+                        Наша платформа создана для тех, кто ценит качество и безопасность.
+                    </p>
+
+                    <h3>📋 Как это работает</h3>
+                    <ul>
+                        <li><strong>Создай анкету</strong> — заполни информацию о себе, загрузи фото и выбери тариф</li>
+                        <li><strong>Оплати размещение</strong> — оплати криптовалютой (BTC, ETH, USDT)</li>
+                        <li><strong>Пройди модерацию</strong> — администратор проверит анкету и опубликует</li>
+                        <li><strong>Появись на сайте</strong> — твоя анкета станет доступна для просмотра</li>
+                    </ul>
+
+                    <h3>🛡️ Почему мы</h3>
+                    <ul>
+                        <li><strong>Ручная модерация</strong> — каждая анкета проверяется администратором</li>
+                        <li><strong>Только проверенные контакты</strong> — мы проверяем Telegram и WhatsApp</li>
+                        <li><strong>Прозрачная система оплаты</strong> — криптовалюта, фиксированные тарифы</li>
+                        <li><strong>VIP и ТОП размещение</strong> — выделяйся среди других анкет</li>
+                        <li><strong>Автоматические новости</strong> — все обновления из Telegram канала</li>
+                    </ul>
+
+                    <h3>🔒 Безопасность</h3>
+                    <ul>
+                        <li>Все данные защищены</li>
+                        <li>Модерация каждой анкеты</li>
+                        <li>Жалобы на анкеты обрабатываются вручную</li>
+                        <li>Криптовалютные платежи через проверенные кошельки</li>
+                    </ul>
+
+                    <h3>📞 Связь с нами</h3>
+                    <p>
+                        Если у вас есть вопросы или предложения — напишите нам в Telegram:
+                        <a href="contacts.html" style="color:var(--primary);font-weight:600;">Перейти в контакты →</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="container footer-inner">
+            <div class="footer-brand">
+                <div class="logo">WeToo</div>
+                <p>Платформа проверенных анкет</p>
+            </div>
+            <div class="footer-links">
+                <a href="index.html">Главная</a>
+                <a href="profiles.html">Анкеты</a>
+                <a href="news.html">Новости</a>
+                <a href="contacts.html">Контакты</a>
+                <a href="about.html">О нас</a>
+            </div>
+            <div class="footer-copy">
+                © 2026 WeToo. Все права защищены.
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initBurger();
+        });
+    </script>
+</body>
+</html>
