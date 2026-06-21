@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Новости — WeToo</title>
+    <meta name="description" content="Новости и обновления платформы WeToo" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="container header-inner">
+            <div class="logo">
+                <a href="index.html">WeToo</a>
+            </div>
+            <button class="burger" id="burgerBtn" aria-label="Меню">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="nav" id="mainNav">
+                <ul>
+                    <li><a href="index.html">Главная</a></li>
+                    <li><a href="profiles.html">Анкеты</a></li>
+                    <li><a href="news.html" class="active">Новости</a></li>
+                    <li><a href="contacts.html">Контакты</a></li>
+                    <li><a href="about.html">О нас</a></li>
+                </ul>
+                <a href="add-profile.html" class="btn btn-primary btn-sm">➕ Подать анкету</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ===== НОВОСТИ ===== -->
+    <section class="news-page">
+        <div class="container">
+            <h1 class="page-title">📰 Новости</h1>
+
+            <div class="news-grid" id="newsGrid">
+                <!-- Загружается через JS -->
+            </div>
+
+            <div class="news-empty" id="newsEmpty" style="display:none;">
+                <div class="empty-icon">📭</div>
+                <h3>Новостей пока нет</h3>
+                <p>Следите за обновлениями в нашем Telegram канале</p>
+                <a href="#" id="newsChannelLink" class="btn btn-primary" target="_blank">📰 Подписаться на канал</a>
+            </div>
+
+            <div class="pagination" id="pagination">
+                <!-- Загружается через JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="container footer-inner">
+            <div class="footer-brand">
+                <div class="logo">WeToo</div>
+                <p>Платформа проверенных анкет</p>
+            </div>
+            <div class="footer-links">
+                <a href="index.html">Главная</a>
+                <a href="profiles.html">Анкеты</a>
+                <a href="news.html">Новости</a>
+                <a href="contacts.html">Контакты</a>
+                <a href="about.html">О нас</a>
+            </div>
+            <div class="footer-copy">
+                © 2026 WeToo. Все права защищены.
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets.js"></script>
+    <script>
+        (function() {
+            'use strict';
+
+            const grid = document.getElementById('newsGrid');
+            const empty = document.getElementById('newsEmpty');
+            const pagination = document.getElementById('pagination');
+            const channelLink = document.getElementById('newsChannelLink');
+
+            // ===== СОСТОЯНИЕ =====
+            const state = {
+                page: 1,
+                limit: 10,
+                total: 0
+            };
+
+            // ===== ЗАГРУЗКА НАСТРОЕК ДЛЯ КАНАЛА =====
+            async function loadChannelSettings() {
+                try {
+                    const settings = await apiFetch('/admin/settings');
+                    const channel = settings.telegram_channel_username || '';
+                    if (channel) {
+                        channelLink.href = 'https://t.me/' + channel.replace('@', '');
+                        channelLink.textContent = '📰 Подписаться на @' + channel.replace('@', '');
+                    } else {
+                        channelLink.href = '#';
+                        channelLink.textContent = '📰 Канал не настроен';
+                        channelLink.style.opacity = '0.6';
+                        channelLink.style.cursor = 'default';
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки настроек канала:', error);
+                }
+            }
+
+            // ===== ЗАГРУЗКА НОВОСТЕЙ =====
+            async function loadNews() {
+                const params = new URLSearchParams();
+                params.set('page', state.page);
+                params.set('limit', state.limit);
+
+                try {
+                    const response = await fetch('/api/news/?' + params.toString());
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.error || 'Ошибка загрузки новостей');
+                    }
+
+                    state.total = data.pagination?.total || 0;
+                    renderNews(data.data || []);
+                    renderPagination(data.pagination);
+
+                } catch (error) {
+                    console.error('Ошибка загрузки новостей:', error);
+                    grid.innerHTML = `
+                        <div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:#e74c3c;">
+                            <div style="font-size:48px;margin-bottom:16px;">⚠️</div>
+                            <h3>Ошибка загрузки</h3>
+                            <p style="color:#666;">${error.message}</p>
+                            <button class="btn btn-secondary" style="margin-top:16px;" onclick="location.reload()">Обновить</button>
+                        </div>
+                    `;
+                    pagination.innerHTML = '';
+                }
+            }
+
+            // ===== ОТРИСОВКА НОВОСТЕЙ =====
+            function renderNews(news) {
+                if (!news || news.length === 0) {
+                    grid.innerHTML = '';
+                    empty.style.display = 'block';
+                    pagination.innerHTML = '';
+                    return;
+                }
+                empty.style.display = 'none';
+
+                grid.innerHTML = news.map(item => {
+                    const imageHtml = item.image_url
+                        ? `<img src="${item.image_url}" alt="${item.title}" class="news-card-img" loading="lazy" />`
+                        : '';
+
+                    return `
+                        <div class="news-card">
+                            ${imageHtml}
+                            <h2 class="news-card-title">${escapeHtml(item.title)}</h2>
+                            <p class="news-card-date">${formatDate(item.published_at)}</p>
+                            <div class="news-card-content">${escapeHtml(item.content).substring(0, 500)}${item.content.length > 500 ? '...' : ''}</div>
+                            ${item.telegram_url ? `<a href="${item.telegram_url}" target="_blank" class="news-card-link">🔗 Читать в Telegram →</a>` : ''}
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // ===== ПАГИНАЦИЯ =====
+            function renderPagination(paginationData) {
+                if (!paginationData || paginationData.pages <= 1) {
+                    pagination.innerHTML = '';
+                    return;
+                }
+
+                const current = paginationData.page;
+                const total = paginationData.pages;
+
+                let html = '';
+                html += `<button class="page-btn" data-page="${current - 1}" ${current <= 1 ? 'disabled' : ''}>‹</button>`;
+
+                for (let i = 1; i <= total; i++) {
+                    if (i === current) {
+                        html += `<button class="page-btn active" data-page="${i}">${i}</button>`;
+                    } else if (i <= 3 || i > total - 3 || Math.abs(i - current) <= 1) {
+                        html += `<button class="page-btn" data-page="${i}">${i}</button>`;
+                    } else if (i === 4 || i === total - 3) {
+                        html += `<span class="page-dots">…</span>`;
+                    }
+                }
+
+                html += `<button class="page-btn" data-page="${current + 1}" ${current >= total ? 'disabled' : ''}>›</button>`;
+
+                pagination.innerHTML = html;
+
+                pagination.querySelectorAll('.page-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const page = parseInt(this.dataset.page);
+                        if (!isNaN(page) && page >= 1 && page <= total) {
+                            state.page = page;
+                            loadNews();
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                    });
+                });
+            }
+
+            // ===== ESCAPE HTML =====
+            function escapeHtml(text) {
+                if (!text) return '';
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            // ===== ИНИЦИАЛИЗАЦИЯ =====
+            document.addEventListener('DOMContentLoaded', function() {
+                initBurger();
+                loadChannelSettings();
+                loadNews();
+            });
+
+        })();
+    </script>
+</body>
+</html>
