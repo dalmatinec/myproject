@@ -4,8 +4,8 @@
 // Настройки базы данных
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'privatclub');
-define('DB_USER', 'privatclub_user');
-define('DB_PASS', 'your_secure_password_here');
+define('DB_USER', 'dalmatinec');
+define('DB_PASS', 'Elina1806');
 
 // Настройки приложения
 define('SITE_NAME', 'PrivatClub');
