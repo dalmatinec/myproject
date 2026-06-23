@@ -1,165 +1,55 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Вход в админку — WeToo</title>
-    <meta name="description" content="Вход в панель управления WeToo" />
-    <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход в систему - PrivatClub</title>
+    <meta name="description" content="Вход в панель управления PrivatClub для администраторов.">
+    <link rel="stylesheet" href="/frontend/style.css">
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
 </head>
-<body>
-
-    <!-- ===== HEADER ===== -->
-    <header class="header">
-        <div class="container header-inner">
-            <div class="logo">
-                <a href="index.html">WeToo</a>
-            </div>
-            <button class="burger" id="burgerBtn" aria-label="Меню">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <nav class="nav" id="mainNav">
-                <ul>
-                    <li><a href="index.html">Главная</a></li>
-                    <li><a href="profiles.html">Анкеты</a></li>
-                    <li><a href="news.html">Новости</a></li>
-                    <li><a href="contacts.html">Контакты</a></li>
-                    <li><a href="about.html">О нас</a></li>
-                </ul>
-                <a href="add-profile.html" class="btn btn-primary btn-sm">➕ Подать анкету</a>
-            </nav>
-        </div>
-    </header>
-
-    <!-- ===== ВХОД ===== -->
-    <section class="login-page">
-        <div class="container">
-            <div class="login-card">
-                <h1>🔐 Вход в админку</h1>
-                <p class="subtitle">Введите логин и пароль для доступа к панели управления</p>
-
-                <form id="loginForm">
-                    <div class="form-group">
-                        <label>Логин</label>
-                        <input type="text" id="loginUsername" class="form-control" placeholder="admin" required autofocus />
+<body class="login-page">
+    <!-- ОСНОВНОЙ КОНТЕНТ -->
+    <main id="main-content" role="main">
+        <!-- БЛОК АВТОРИЗАЦИИ -->
+        <section id="login-section" class="login-section">
+            <div class="login-container">
+                <div class="login-card">
+                    <div class="login-logo">
+                        <svg width="56" height="56" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="4" y="4" width="32" height="32" rx="8" stroke="#6C63FF" stroke-width="2"/>
+                            <path d="M20 10L22.5 17.5L30 18L24 23L25.5 30.5L20 26.5L14.5 30.5L16 23L10 18L17.5 17.5L20 10Z" fill="#6C63FF"/>
+                        </svg>
+                        <span>PrivatClub</span>
                     </div>
-                    <div class="form-group">
-                        <label>Пароль</label>
-                        <input type="password" id="loginPassword" class="form-control" placeholder="Введите пароль" required />
-                    </div>
-                    <button type="submit" class="btn btn-primary login-submit" id="loginBtn">Войти</button>
-                    <div class="login-error" id="loginError"></div>
-                </form>
 
-                <div style="margin-top:20px;text-align:center;font-size:13px;color:var(--text-light);">
-                    <p>Если вы забыли пароль — обратитесь к администратору</p>
+                    <h1 class="login-title" data-translate="login_title">Вход в систему</h1>
+                    <p class="login-subtitle" data-translate="login_subtitle">Панель управления PrivatClub</p>
+
+                    <form id="login-form" novalidate>
+                        <div class="login-form-group">
+                            <label for="login-username" class="login-label" data-translate="login_user_label">Логин</label>
+                            <input type="text" id="login-username" name="username" class="login-input" required data-translate-placeholder="login_user_placeholder">
+                        </div>
+
+                        <div class="login-form-group">
+                            <label for="login-password" class="login-label" data-translate="login_pass_label">Пароль</label>
+                            <input type="password" id="login-password" name="password" class="login-input" required data-translate-placeholder="login_pass_placeholder">
+                        </div>
+
+                        <div id="login-error" class="login-error" style="display: none;" data-translate="login_error_text">Неверный логин или пароль</div>
+
+                        <button type="submit" class="btn btn-primary login-btn" id="btn-login" data-translate="login_btn">Войти</button>
+                    </form>
+
+                    <div class="login-footer">
+                        <a href="/frontend/index.html" class="login-back-link" data-translate="login_back_link">Вернуться на сайт</a>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </main>
 
-    <!-- ===== FOOTER ===== -->
-    <footer class="footer">
-        <div class="container footer-inner">
-            <div class="footer-brand">
-                <div class="logo">WeToo</div>
-                <p>Платформа проверенных анкет</p>
-            </div>
-            <div class="footer-links">
-                <a href="index.html">Главная</a>
-                <a href="profiles.html">Анкеты</a>
-                <a href="news.html">Новости</a>
-                <a href="contacts.html">Контакты</a>
-                <a href="about.html">О нас</a>
-            </div>
-            <div class="footer-copy">
-                © 2026 WeToo. Все права защищены.
-            </div>
-        </div>
-    </footer>
-
-    <script src="assets.js"></script>
-    <script>
-        (function() {
-            'use strict';
-
-            const form = document.getElementById('loginForm');
-            const usernameInput = document.getElementById('loginUsername');
-            const passwordInput = document.getElementById('loginPassword');
-            const submitBtn = document.getElementById('loginBtn');
-            const errorDiv = document.getElementById('loginError');
-
-            // ===== ПРОВЕРКА: уже авторизован =====
-            if (isLoggedIn()) {
-                window.location.href = 'admin.html';
-                return;
-            }
-
-            // ===== ОТПРАВКА ФОРМЫ =====
-            form.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                hideError();
-
-                const username = usernameInput.value.trim();
-                const password = passwordInput.value;
-
-                if (!username || !password) {
-                    showError('Заполните все поля');
-                    return;
-                }
-
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Вход...';
-
-                try {
-                    const data = await apiFetch('/auth/login', {
-                        method: 'POST',
-                        body: JSON.stringify({ username, password })
-                    });
-
-                    if (data.token) {
-                        setToken(data.token);
-                        window.location.href = 'admin.html';
-                    } else {
-                        throw new Error('Токен не получен');
-                    }
-
-                } catch (error) {
-                    console.error('Ошибка входа:', error);
-                    showError(error.message || 'Неверный логин или пароль');
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Войти';
-                    passwordInput.value = '';
-                    passwordInput.focus();
-                }
-            });
-
-            // ===== ВВОД ПО ENTER =====
-            passwordInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    form.dispatchEvent(new Event('submit'));
-                }
-            });
-
-            // ===== УТИЛИТЫ =====
-            function showError(message) {
-                errorDiv.textContent = message;
-                errorDiv.style.display = 'block';
-            }
-
-            function hideError() {
-                errorDiv.style.display = 'none';
-            }
-
-            // ===== ИНИЦИАЛИЗАЦИЯ =====
-            document.addEventListener('DOMContentLoaded', function() {
-                initBurger();
-                usernameInput.focus();
-            });
-
-        })();
-    </script>
+    <script src="/frontend/app.js"></script>
 </body>
 </html>
