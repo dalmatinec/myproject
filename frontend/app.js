@@ -1694,6 +1694,126 @@ document.addEventListener('DOMContentLoaded', function() {
     checkAuth();
 });
 
+// ========================================
+// ГОРОДА И ТАРИФЫ (ДОБАВЛЕНО)
+// ========================================
+
+function loadCitiesList() {
+    fetch('/backend/admin.php?action=cities')
+        .then(response => response.json())
+        .then(data => {
+            const list = document.getElementById('cities-list');
+            if (!list) return;
+            list.innerHTML = '';
+            if (data.data && data.data.length > 0) {
+                data.data.forEach(city => {
+                    const li = document.createElement('li');
+                    li.className = 'admin-list-item';
+                    li.innerHTML = `<span>${city.name}</span><button class="btn-delete" data-id="${city.id}" data-type="city">Удалить</button>`;
+                    list.appendChild(li);
+                });
+            } else {
+                list.innerHTML = '<li class="admin-empty">Города не добавлены</li>';
+            }
+        })
+        .catch(() => console.error('Failed to load cities'));
+}
+
+function loadTariffsList() {
+    fetch('/backend/admin.php?action=tariffs')
+        .then(response => response.json())
+        .then(data => {
+            const list = document.getElementById('tariffs-list');
+            if (!list) return;
+            list.innerHTML = '';
+            if (data.data && data.data.length > 0) {
+                data.data.forEach(tariff => {
+                    const li = document.createElement('li');
+                    li.className = 'admin-list-item';
+                    li.innerHTML = `<span>${tariff.name} — ${tariff.price} ₽</span><button class="btn-delete" data-id="${tariff.id}" data-type="tariff">Удалить</button>`;
+                    list.appendChild(li);
+                });
+            } else {
+                list.innerHTML = '<li class="admin-empty">Тарифы не добавлены</li>';
+            }
+        })
+        .catch(() => console.error('Failed to load tariffs'));
+}
+
+function initCityForm() {
+    const form = document.getElementById('admin-city-form');
+    if (!form) return;
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const name = document.getElementById('city-name').value.trim();
+        if (!name) { alert('Введите название города'); return; }
+        fetch('/backend/admin.php?action=cities', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: name })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('city-name').value = '';
+                loadCitiesList();
+            } else {
+                alert(data.error || 'Ошибка добавления города');
+            }
+        })
+        .catch(() => alert('Ошибка соединения с сервером'));
+    });
+}
+
+function initTariffForm() {
+    const form = document.getElementById('admin-tariff-form');
+    if (!form) return;
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const name = document.getElementById('tariff-name').value.trim();
+        const price = parseFloat(document.getElementById('tariff-price').value);
+        if (!name) { alert('Введите название тарифа'); return; }
+        if (isNaN(price) || price < 0) { alert('Введите корректную цену'); return; }
+        fetch('/backend/admin.php?action=tariffs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: name, price: price })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('tariff-name').value = '';
+                document.getElementById('tariff-price').value = '';
+                loadTariffsList();
+            } else {
+                alert(data.error || 'Ошибка добавления тарифа');
+            }
+        })
+        .catch(() => alert('Ошибка соединения с сервером'));
+    });
+}
+
+function initDeleteButtons() {
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.btn-delete');
+        if (!btn) return;
+        const id = btn.dataset.id;
+        const type = btn.dataset.type;
+        if (!confirm(`Удалить ${type === 'city' ? 'город' : 'тариф'}?`)) return;
+        fetch(`/backend/admin.php?action=${type}&id=${id}`, { method: 'DELETE' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (type === 'city') loadCitiesList();
+                    else loadTariffsList();
+                } else {
+                    alert(data.error || 'Ошибка удаления');
+                }
+            })
+            .catch(() => alert('Ошибка соединения с сервером'));
+    });
+}
+
 // ======================================== */
 // ФАЙЛ APP.JS УСПЕШНО ЗАВЕРШЕН */
 // ======================================== */
