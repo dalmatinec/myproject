@@ -4,8 +4,8 @@
 // Настройки базы данных
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'privatclub');
-define('DB_USER', 'privatclub_user');
-define('DB_PASS', 'your_secure_password_here');
+define('DB_USER', 'privat');
+define('DB_PASS', 'gangster2026');
 
 // Настройки приложения
 define('SITE_NAME', 'PrivatClub');
