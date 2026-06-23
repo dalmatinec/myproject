@@ -64,8 +64,8 @@ try {
 }
 
 // Создание администратора
-$username = 'admin';
-$password = 'admin123';
+$username = 'bigbro';
+$password = 'gangster2026';
 $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
 try {
