@@ -559,44 +559,40 @@ function initLogout() {
 // ========================================
 // 11. ЗАГРУЗКА ГОРОДОВ
 // ========================================
-
 function loadCities() {
-    const selects = document.querySelectorAll('select[name="city_id"], #filter-city, #profile-city-select');
-    if (!selects.length) return;
-    
-    // Пример данных городов (в реальном проекте - запрос к БД)
-    const cities = [
-        { id: 1, name: 'Москва' },
-        { id: 2, name: 'Санкт-Петербург' },
-        { id: 3, name: 'Новосибирск' },
-        { id: 4, name: 'Екатеринбург' },
-        { id: 5, name: 'Казань' },
-        { id: 6, name: 'Краснодар' },
-        { id: 7, name: 'Сочи' },
-        { id: 8, name: 'Ростов-на-Дону' }
-    ];
-    
-    selects.forEach(function(select) {
-        // Сохраняем первый пустой option
-        const firstOption = select.querySelector('option[value=""]');
-        select.innerHTML = '';
-        
-        if (firstOption) {
-            select.appendChild(firstOption);
-        } else {
-            const defaultOption = document.createElement('option');
-            defaultOption.value = '';
-            defaultOption.textContent = select.id === 'filter-city' ? 'Все города' : 'Выберите город';
-            select.appendChild(defaultOption);
-        }
-        
-        cities.forEach(function(city) {
-            const option = document.createElement('option');
-            option.value = city.id;
-            option.textContent = city.name;
-            select.appendChild(option);
+    fetch('/backend/admin.php?action=cities')
+        .then(response => response.json())
+        .then(data => {
+            const selects = document.querySelectorAll('select[name="city_id"], #filter-city, #profile-city-select');
+            if (!selects.length) return;
+
+            selects.forEach(function(select) {
+                // Сохраняем первый пустой option
+                const firstOption = select.querySelector('option[value=""]');
+                select.innerHTML = '';
+
+                if (firstOption) {
+                    select.appendChild(firstOption);
+                } else {
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.textContent = select.id === 'filter-city' ? 'Все города' : 'Выберите город';
+                    select.appendChild(defaultOption);
+                }
+
+                if (data.data && data.data.length > 0) {
+                    data.data.forEach(function(city) {
+                        const option = document.createElement('option');
+                        option.value = city.id;
+                        option.textContent = city.name;
+                        select.appendChild(option);
+                    });
+                }
+            });
+        })
+        .catch(function() {
+            console.error('Failed to load cities from database');
         });
-    });
 }
 
 // ========================================
