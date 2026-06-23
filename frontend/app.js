@@ -1692,6 +1692,13 @@ document.addEventListener('DOMContentLoaded', function() {
     loadWallets();
     loadProfileStats();
     checkAuth();
+
+// Инициализация городов и тарифов
+    loadCitiesList();
+    loadTariffsList();
+    initCityForm();
+    initTariffForm();
+    initDeleteButtons();
 });
 
 // ========================================
