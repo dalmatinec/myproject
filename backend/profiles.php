@@ -15,7 +15,7 @@ switch ($method) {
         }
         break;
     case 'POST':
-        requireAdmin();
+        
         createProfile();
         break;
     case 'PUT':
