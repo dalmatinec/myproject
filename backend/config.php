@@ -4,8 +4,8 @@
 // Настройки базы данных
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'privatclub');
-define('DB_USER', 'dalmatinec');
-define('DB_PASS', 'Elina1806');
+define('DB_USER', 'privatclub_user');
+define('DB_PASS', 'your_secure_password_here');
 
 // Настройки приложения
 define('SITE_NAME', 'PrivatClub');
@@ -53,7 +53,7 @@ function getDB() {
 
 // Проверка установки
 function isInstalled() {
-    return file_exists(SITE_PATH . '/.installed');
+    return file_exists(__DIR__ . '/install.lock');
 }
 
 // Проверка авторизации администратора
@@ -177,11 +177,4 @@ function isAllowedExtension($filename) {
 // Запуск сессии если ещё не запущена
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
-}
-
-// Проверка установки для всех запросов кроме install.php
-$currentFile = basename($_SERVER['PHP_SELF']);
-if ($currentFile !== 'install.php' && !isInstalled()) {
-    header('Location: /backend/install.php');
-    exit;
 }
