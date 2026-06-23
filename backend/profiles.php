@@ -266,12 +266,31 @@ function getProfile($id) {
 function createProfile() {
     try {
         $pdo = getDB();
-        $input = json_decode(file_get_contents('php://input'), true);
         
-        if (!$input) {
-            jsonResponse(['error' => 'Invalid input data'], 400);
+        // Определяем тип данных (JSON или FormData)
+        $contentType = isset($_SERVER['CONTENT_TYPE']) ? $_SERVER['CONTENT_TYPE'] : '';
+        
+        if (strpos($contentType, 'application/json') !== false) {
+            // Если пришел JSON
+            $input = json_decode(file_get_contents('php://input'), true);
+            if (!$input) {
+                jsonResponse(['error' => 'Invalid input data'], 400);
+            }
+        } else {
+            // Если пришла FormData (с фото)
+            $input = [
+                'name' => isset($_POST['name']) ? trim($_POST['name']) : '',
+                'age' => isset($_POST['age']) ? (int)$_POST['age'] : '',
+                'city_id' => isset($_POST['city_id']) ? (int)$_POST['city_id'] : '',
+                'tariff_id' => isset($_POST['tariff_id']) && !empty($_POST['tariff_id']) ? (int)$_POST['tariff_id'] : null,
+                'telegram' => isset($_POST['telegram']) ? trim($_POST['telegram']) : '',
+                'whatsapp' => isset($_POST['whatsapp']) ? trim($_POST['whatsapp']) : '',
+                'description' => isset($_POST['description']) ? trim($_POST['description']) : '',
+                'status' => isset($_POST['status']) ? trim($_POST['status']) : 'pending',
+                'is_vip' => isset($_POST['is_vip']) ? (int)$_POST['is_vip'] : 0
+            ];
         }
-        
+
         // Валидация обязательных полей
         $required = ['name', 'age', 'city_id'];
         foreach ($required as $field) {
@@ -290,7 +309,6 @@ function createProfile() {
         $description = isset($input['description']) ? sanitize($input['description']) : null;
         $status = isset($input['status']) ? sanitize($input['status']) : 'pending';
         $isVip = isset($input['is_vip']) ? (int)$input['is_vip'] : 0;
-        $mainPhoto = isset($input['main_photo']) ? sanitize($input['main_photo']) : null;
         
         // Проверка существования города
         $stmt = $pdo->prepare("SELECT id FROM cities WHERE id = ?");
@@ -310,11 +328,53 @@ function createProfile() {
         
         // Вставка профиля
         $stmt = $pdo->prepare("
-            INSERT INTO profiles (name, age, city_id, tariff_id, telegram, whatsapp, description, status, is_vip, main_photo)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO profiles (name, age, city_id, tariff_id, telegram, whatsapp, description, status, is_vip)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
-        $stmt->execute([$name, $age, $cityId, $tariffId, $telegram, $whatsapp, $description, $status, $isVip, $mainPhoto]);
+        $stmt->execute([$name, $age, $cityId, $tariffId, $telegram, $whatsapp, $description, $status, $isVip]);
         $profileId = $pdo->lastInsertId();
+        
+        // Обработка загруженных фото
+        if (isset($_FILES['photos']) && !empty($_FILES['photos']['name'][0])) {
+            $uploadDir = UPLOAD_DIR;
+            if (!file_exists($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+            
+            foreach ($_FILES['photos']['tmp_name'] as $index => $tmpName) {
+                if ($_FILES['photos']['error'][$index] === UPLOAD_ERR_OK) {
+                    $ext = strtolower(pathinfo($_FILES['photos']['name'][$index], PATHINFO_EXTENSION));
+                    if (!in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) continue;
+                    
+                    $fileName = bin2hex(random_bytes(16)) . '.' . $ext;
+                    $filePath = $uploadDir . $fileName;
+                    
+                    if (move_uploaded_file($tmpName, $filePath)) {
+                        $isMain = ($index === 0) ? 1 : 0;
+                        $stmt = $pdo->prepare("
+                            INSERT INTO profile_photos (profile_id, file_name, is_main, sort_order)
+                            VALUES (?, ?, ?, ?)
+                        ");
+                        $stmt->execute([$profileId, $fileName, $isMain, $index]);
+                    }
+                }
+            }
+        }
+        
+        jsonResponse([
+            'success' => true,
+            'message' => 'Profile created successfully',
+            'profile_id' => $profileId
+        ]);
+        
+    } catch (PDOException $e) {
+        if (DEBUG_MODE) {
+            jsonResponse(['error' => 'Database error: ' . $e->getMessage()], 500);
+        } else {
+            jsonResponse(['error' => 'Failed to create profile'], 500);
+        }
+    }
+}
         
         // Сохранение фото (если переданы)
         if (isset($input['photos']) && is_array($input['photos'])) {
