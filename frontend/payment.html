@@ -1,413 +1,279 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Оплата — WeToo</title>
-    <meta name="description" content="Оплата размещения анкеты криптовалютой" />
-    <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оплата - PrivatClub</title>
+    <meta name="description" content="Оплата размещения анкеты в PrivatClub. Криптовалютные реквизиты и форма подтверждения платежа.">
+    <link rel="stylesheet" href="/frontend/style.css">
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
 </head>
 <body>
+    <!-- ОВЕРЛЕЙ ДЛЯ МЕНЮ -->
+    <div id="menu-overlay"></div>
 
-    <!-- ===== HEADER ===== -->
-    <header class="header">
-        <div class="container header-inner">
+    <!-- ШАПКА -->
+    <header id="main-header" role="banner">
+        <div class="container header-container">
             <div class="logo">
-                <a href="index.html">WeToo</a>
+                <a href="/frontend/index.html" aria-label="PrivatClub">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="4" y="4" width="32" height="32" rx="8" stroke="#6C63FF" stroke-width="2"/>
+                        <path d="M20 10L22.5 17.5L30 18L24 23L25.5 30.5L20 26.5L14.5 30.5L16 23L10 18L17.5 17.5L20 10Z" fill="#6C63FF"/>
+                    </svg>
+                    <span>PrivatClub</span>
+                </a>
             </div>
-            <button class="burger" id="burgerBtn" aria-label="Меню">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <nav class="nav" id="mainNav">
-                <ul>
-                    <li><a href="index.html">Главная</a></li>
-                    <li><a href="profiles.html">Анкеты</a></li>
-                    <li><a href="news.html">Новости</a></li>
-                    <li><a href="contacts.html">Контакты</a></li>
-                    <li><a href="about.html">О нас</a></li>
+            
+            <nav id="main-nav" role="navigation" aria-label="Главная навигация">
+                <ul class="nav-menu">
+                    <li>
+                        <a href="/frontend/index.html">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M2 10L10 3L18 10V17C18 17.5523 17.5523 18 17 18H3C2.44772 18 2 17.5523 2 17V10Z"/>
+                                <path d="M7 14V18H13V14H7Z"/>
+                            </svg>
+                            Главная
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/frontend/profiles.html">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="7" cy="7" r="4"/>
+                                <circle cx="15" cy="15" r="3"/>
+                                <path d="M3 17C5 15 9 15 11 17"/>
+                            </svg>
+                            Анкеты
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/frontend/news.html">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="3" y="4" width="14" height="12" rx="1"/>
+                                <line x1="6" y1="8" x2="14" y2="8"/>
+                                <line x1="6" y1="11" x2="12" y2="11"/>
+                                <line x1="6" y1="14" x2="10" y2="14"/>
+                            </svg>
+                            Новости
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/frontend/contacts.html">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M2 4C2 3.44772 2.44772 3 3 3H17C17.5523 3 18 3.44772 18 4V16C18 16.5523 17.5523 17 17 17H3C2.44772 17 2 16.5523 2 16V4Z"/>
+                                <path d="M2 5L10 11L18 5"/>
+                            </svg>
+                            Контакты
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/frontend/about.html">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="10" cy="7" r="3"/>
+                                <path d="M3 17C5 13 15 13 17 17"/>
+                                <circle cx="10" cy="10" r="9"/>
+                            </svg>
+                            О нас
+                        </a>
+                    </li>
                 </ul>
-                <a href="add-profile.html" class="btn btn-primary btn-sm">➕ Подать анкету</a>
             </nav>
+            
+            <div class="header-actions">
+                <button class="lang-toggle" data-lang="ru" aria-label="Русский язык">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M10 1C7 1 4 4 4 10C4 16 7 19 10 19" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M10 1C13 1 16 4 16 10C16 16 13 19 10 19" stroke="currentColor" stroke-width="1.5"/>
+                        <line x1="1" y1="10" x2="19" y2="10" stroke="currentColor" stroke-width="1.5"/>
+                    </svg>
+                </button>
+                <button class="lang-toggle" data-lang="en" aria-label="English language">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5"/>
+                        <line x1="1" y1="10" x2="19" y2="10" stroke="currentColor" stroke-width="1.5"/>
+                        <line x1="10" y1="1" x2="10" y2="19" stroke="currentColor" stroke-width="1.5"/>
+                    </svg>
+                </button>
+                <button class="burger-menu" aria-label="Открыть меню" aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
         </div>
     </header>
 
-    <!-- ===== ОПЛАТА ===== -->
-    <section class="payment-page">
+    <!-- МОБИЛЬНОЕ МЕНЮ -->
+    <div id="mobile-menu" role="dialog" aria-label="Мобильная навигация" aria-modal="true">
+        <button class="menu-close" aria-label="Закрыть меню">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </button>
+        <nav role="navigation">
+            <ul class="mobile-nav-menu">
+                <li>
+                    <a href="/frontend/index.html">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M2 10L10 3L18 10V17C18 17.5523 17.5523 18 17 18H3C2.44772 18 2 17.5523 2 17V10Z"/>
+                            <path d="M7 14V18H13V14H7Z"/>
+                        </svg>
+                        Главная
+                    </a>
+                </li>
+                <li>
+                    <a href="/frontend/profiles.html">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="7" cy="7" r="4"/>
+                            <circle cx="15" cy="15" r="3"/>
+                            <path d="M3 17C5 15 9 15 11 17"/>
+                        </svg>
+                        Анкеты
+                    </a>
+                </li>
+                <li>
+                    <a href="/frontend/news.html">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <rect x="3" y="4" width="14" height="12" rx="1"/>
+                            <line x1="6" y1="8" x2="14" y2="8"/>
+                            <line x1="6" y1="11" x2="12" y2="11"/>
+                            <line x1="6" y1="14" x2="10" y2="14"/>
+                        </svg>
+                        Новости
+                    </a>
+                </li>
+                <li>
+                    <a href="/frontend/contacts.html">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M2 4C2 3.44772 2.44772 3 3 3H17C17.5523 3 18 3.44772 18 4V16C18 16.5523 17.5523 17 17 17H3C2.44772 17 2 16.5523 2 16V4Z"/>
+                            <path d="M2 5L10 11L18 5"/>
+                        </svg>
+                        Контакты
+                    </a>
+                </li>
+                <li>
+                    <a href="/frontend/about.html">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="10" cy="7" r="3"/>
+                            <path d="M3 17C5 13 15 13 17 17"/>
+                            <circle cx="10" cy="10" r="9"/>
+                        </svg>
+                        О нас
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- ОСНОВНОЙ КОНТЕНТ -->
+    <main id="main-content" role="main">
+        <!-- ЗАГОЛОВОК СТРАНИЦЫ -->
+        <section class="page-header">
+            <div class="container">
+                <h1 class="page-title" data-translate="payment_title">Оплата анкеты</h1>
+                <p class="page-subtitle" data-translate="payment_subtitle">Оплатите размещение и станьте участником PrivatClub</p>
+            </div>
+        </section>
+
+        <!-- ИНФОРМАЦИЯ О ЗАКАЗЕ -->
+        <section id="payment-info-section" class="payment-info-section">
+            <div class="container">
+                <div class="payment-summary">
+                    <div class="payment-summary-item">
+                        <span class="payment-summary-label" data-translate="payment_tariff_label">Выбранный тариф</span>
+                        <span class="payment-summary-value" id="payment-tariff">-</span>
+                    </div>
+                    <div class="payment-summary-item">
+                        <span class="payment-summary-label" data-translate="payment_amount_label">Сумма к оплате</span>
+                        <span class="payment-summary-value" id="payment-amount">-</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- СПИСОК РЕКВИЗИТОВ -->
+        <section id="payment-wallets" class="payment-wallets-section">
+            <div class="container">
+                <h2 class="section-title" data-translate="payment_wallets_title">Реквизиты для оплаты</h2>
+                <div class="wallets-grid" id="wallets-container">
+                    <!-- Динамический рендеринг через JavaScript -->
+                    <div class="wallet-placeholder" id="wallets-empty">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="#6C63FF" stroke-width="1.5">
+                            <rect x="6" y="14" width="36" height="24" rx="2"/>
+                            <rect x="14" y="20" width="20" height="12" rx="1"/>
+                            <circle cx="28" cy="26" r="2" fill="#6C63FF"/>
+                        </svg>
+                        <p data-translate="wallets_empty">Реквизиты еще не добавлены администратором</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ФОРМА ПОДТВЕРЖДЕНИЯ ПЛАТЕЖА -->
+        <section id="payment-form-section" class="payment-form-section">
+            <div class="container">
+                <h2 class="section-title" data-translate="payment_confirm_title">Подтверждение платежа</h2>
+                <form id="payment-form" enctype="multipart/form-data" novalidate>
+                    <div class="form-group">
+                        <label for="payment-txid" data-translate="payment_txid_label">Хеш транзакции / TXID</label>
+                        <input type="text" id="payment-txid" name="transaction_ref" required data-translate-placeholder="payment_txid_placeholder">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="payment-receipt" data-translate="payment_receipt_label">Скриншот чека</label>
+                        <input type="file" id="payment-receipt" name="payment_receipt" accept="image/jpeg,image/png,image/webp" required>
+                        <small data-translate="payment_receipt_hint">Загрузите скриншот перевода с указанием суммы и адреса</small>
+                    </div>
+
+                    <div class="payment-actions">
+                        <button type="submit" class="btn btn-primary" id="btn-confirm-payment" data-translate="payment_confirm_btn">Я оплатил, отправить на модерацию</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- ПОДВАЛ -->
+    <footer id="main-footer" role="contentinfo">
         <div class="container">
-            <div class="payment-card">
-                <h1>💰 Оплата размещения</h1>
-                <p class="subtitle">Оплатите анкету криптовалютой и отправьте на модерацию</p>
-
-                <!-- Информация об анкете -->
-                <div class="payment-profile-info" id="profileInfo">
-                    <div>
-                        <div class="label">Анкета</div>
-                        <div class="value" id="profileName">Загрузка...</div>
-                    </div>
-                    <div>
-                        <div class="label">Тариф</div>
-                        <div class="value" id="profilePlan">Загрузка...</div>
-                    </div>
-                    <div>
-                        <div class="label">Сумма</div>
-                        <div class="value" id="profileAmount">Загрузка...</div>
-                    </div>
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <a href="/frontend/index.html">
+                        <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="4" y="4" width="32" height="32" rx="8" stroke="#6C63FF" stroke-width="2"/>
+                            <path d="M20 10L22.5 17.5L30 18L24 23L25.5 30.5L20 26.5L14.5 30.5L16 23L10 18L17.5 17.5L20 10Z" fill="#6C63FF"/>
+                        </svg>
+                        <span>PrivatClub</span>
+                    </a>
                 </div>
-
-                <!-- Выбор валюты -->
-                <div class="currency-selector" id="currencySelector">
-                    <div class="currency-option" data-currency="BTC">
-                        <div class="currency-icon">₿</div>
-                        <div class="currency-name">BTC</div>
-                        <div class="currency-amount" id="btcAmount">—</div>
-                    </div>
-                    <div class="currency-option" data-currency="ETH">
-                        <div class="currency-icon">⟠</div>
-                        <div class="currency-name">ETH</div>
-                        <div class="currency-amount" id="ethAmount">—</div>
-                    </div>
-                    <div class="currency-option" data-currency="USDT">
-                        <div class="currency-icon">₮</div>
-                        <div class="currency-name">USDT</div>
-                        <div class="currency-amount" id="usdtAmount">—</div>
-                    </div>
+                <div class="footer-links">
+                    <ul>
+                        <li><a href="/frontend/index.html">Главная</a></li>
+                        <li><a href="/frontend/profiles.html">Анкеты</a></li>
+                        <li><a href="/frontend/news.html">Новости</a></li>
+                        <li><a href="/frontend/contacts.html">Контакты</a></li>
+                        <li><a href="/frontend/about.html">О нас</a></li>
+                    </ul>
                 </div>
-
-                <!-- Детали оплаты -->
-                <div class="payment-details" id="paymentDetails">
-                    <div class="detail-row">
-                        <span class="detail-label">Сумма</span>
-                        <span class="detail-value" id="detailAmount">—</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Кошелек</span>
-                        <span class="detail-value" id="detailWallet">
-                            <span id="walletAddress">—</span>
-                            <button class="copy-btn" id="copyWalletBtn" title="Скопировать адрес">📋</button>
-                        </span>
-                    </div>
-                    <div class="detail-row" style="border-bottom: none; padding-top:12px; margin-top:4px; border-top: 1px solid var(--border);">
-                        <span class="detail-label">Статус</span>
-                        <span class="detail-value" style="color:#F1C40F;">⏳ Ожидает оплаты</span>
-                    </div>
+                <div class="footer-contacts" id="footer-contacts">
+                    <!-- Динамический рендеринг через JavaScript -->
                 </div>
-
-                <!-- TXID -->
-                <div class="txid-input">
-                    <label>📝 Хэш транзакции (опционально)</label>
-                    <input type="text" id="txidInput" class="form-control" placeholder="0x123abc... или TXID" />
-                    <div class="hint" style="font-size:12px;color:var(--text-light);margin-top:4px;">Можете указать хэш транзакции для ускорения проверки</div>
+                <div class="footer-copy">
+                    <p>&copy; <span id="footer-year">2026</span> PrivatClub. Все права защищены.</p>
                 </div>
-
-                <!-- Загрузка скриншота -->
-                <div class="screenshot-upload">
-                    <div class="file-upload-area" id="screenshotArea">
-                        <input type="file" id="screenshotInput" accept="image/*" />
-                        <div class="icon">📸</div>
-                        <div class="text">
-                            <strong>Загрузите скриншот оплаты</strong><br />
-                            <span style="font-size:12px;color:var(--text-light);">Поддерживаются JPG, PNG, WEBP</span>
-                        </div>
-                    </div>
-                    <div class="screenshot-preview" id="screenshotPreview">
-                        <img id="screenshotImg" src="" alt="Скриншот оплаты" />
-                    </div>
-                </div>
-
-                <!-- Блок обменника -->
-                <div class="exchange-block" id="exchangeBlock">
-                    <div class="exchange-icon">💱</div>
-                    <h4>Нет криптовалюты?</h4>
-                    <p>Мы поможем с обменом! Напишите нашему специалисту,<br />и мы обменяем ваши деньги на криптовалюту.</p>
-                    <a href="#" id="exchangeLink" class="btn btn-primary" target="_blank">💱 Помощь с обменом</a>
-                </div>
-
-                <!-- Кнопка отправки -->
-                <button class="btn btn-primary payment-submit" id="paymentSubmit" disabled>
-                    ✅ Оплатил, отправить на модерацию
-                </button>
-
-                <!-- Сообщение об ошибке -->
-                <div id="paymentError" style="display:none;margin-top:12px;padding:12px;background:#FDEDEC;color:#E74C3C;border-radius:var(--radius-sm);text-align:center;"></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== FOOTER ===== -->
-    <footer class="footer">
-        <div class="container footer-inner">
-            <div class="footer-brand">
-                <div class="logo">WeToo</div>
-                <p>Платформа проверенных анкет</p>
-            </div>
-            <div class="footer-links">
-                <a href="index.html">Главная</a>
-                <a href="profiles.html">Анкеты</a>
-                <a href="news.html">Новости</a>
-                <a href="contacts.html">Контакты</a>
-                <a href="about.html">О нас</a>
-            </div>
-            <div class="footer-copy">
-                © 2026 WeToo. Все права защищены.
             </div>
         </div>
     </footer>
 
-    <script src="assets.js"></script>
-    <script>
-        (function() {
-            'use strict';
+    <!-- КНОПКА НАВЕРХ -->
+    <button id="btn-to-top" aria-label="Наверх">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 15L12 9L6 15"/>
+        </svg>
+    </button>
 
-            const state = {
-                profileId: null,
-                planId: null,
-                planName: null,
-                prices: {},
-                selectedCurrency: null,
-                screenshotFile: null,
-                isSubmitting: false
-            };
-
-            const profileName = document.getElementById('profileName');
-            const profilePlan = document.getElementById('profilePlan');
-            const profileAmount = document.getElementById('profileAmount');
-            const currencyOptions = document.querySelectorAll('.currency-option');
-            const paymentDetails = document.getElementById('paymentDetails');
-            const detailAmount = document.getElementById('detailAmount');
-            const walletAddress = document.getElementById('walletAddress');
-            const copyWalletBtn = document.getElementById('copyWalletBtn');
-            const screenshotInput = document.getElementById('screenshotInput');
-            const screenshotPreview = document.getElementById('screenshotPreview');
-            const screenshotImg = document.getElementById('screenshotImg');
-            const txidInput = document.getElementById('txidInput');
-            const submitBtn = document.getElementById('paymentSubmit');
-            const paymentError = document.getElementById('paymentError');
-            const exchangeLink = document.getElementById('exchangeLink');
-
-            function getProfileId() {
-                const params = new URLSearchParams(window.location.search);
-                return params.get('profile_id');
-            }
-
-            async function loadProfile() {
-                const id = getProfileId();
-                if (!id) { showError('ID анкеты не указан'); return; }
-                state.profileId = parseInt(id);
-
-                try {
-                    const response = await fetch('/api/profiles/' + id);
-                    const profile = await response.json();
-                    if (!response.ok) throw new Error(profile.error || 'Анкета не найдена');
-                    if (profile.status !== 'pending') {
-                        throw new Error('Анкета уже обработана. Статус: ' + profile.status);
-                    }
-                    state.planId = profile.plan_id;
-                    state.planName = profile.plan_name || 'Неизвестный тариф';
-                    profileName.textContent = profile.name + ', ' + profile.age + ' лет, ' + (profile.city_name || 'город не указан');
-                    profilePlan.textContent = state.planName;
-                    await loadPlanPrices();
-                } catch (error) {
-                    console.error('Ошибка загрузки анкеты:', error);
-                    showError(error.message || 'Ошибка загрузки анкеты');
-                    submitBtn.disabled = true;
-                }
-            }
-
-            async function loadPlanPrices() {
-                try {
-                    const plans = await apiFetch('/profiles/plans');
-                    const plan = plans.find(p => p.id === state.planId);
-                    if (!plan) throw new Error('Тариф не найден');
-                    state.prices = { BTC: plan.price_btc || 0, ETH: plan.price_eth || 0, USDT: plan.price_usdt || 0 };
-                    document.getElementById('btcAmount').textContent = state.prices.BTC > 0 ? state.prices.BTC + ' BTC' : '—';
-                    document.getElementById('ethAmount').textContent = state.prices.ETH > 0 ? state.prices.ETH + ' ETH' : '—';
-                    document.getElementById('usdtAmount').textContent = state.prices.USDT > 0 ? state.prices.USDT + ' USDT' : '—';
-                    const total = Object.values(state.prices).reduce((sum, v) => sum + v, 0);
-                    profileAmount.textContent = total > 0 ? 'от ' + total + ' USDT' : '—';
-
-                    currencyOptions.forEach(opt => {
-                        const currency = opt.dataset.currency;
-                        const price = state.prices[currency] || 0;
-                        if (price > 0) { opt.style.opacity = '1';
-                            opt.style.cursor = 'pointer';
-                            opt.dataset.price = price; } else { opt.style.opacity = '0.4';
-                            opt.style.cursor = 'default';
-                            opt.dataset.price = '0'; }
-                    });
-
-                    const firstAvailable = document.querySelector('.currency-option[data-price]:not([data-price="0"])');
-                    if (firstAvailable) selectCurrency(firstAvailable);
-                } catch (error) {
-                    console.error('Ошибка загрузки тарифов:', error);
-                    showError('Ошибка загрузки цен тарифов');
-                }
-            }
-
-            function selectCurrency(element) {
-                const price = parseFloat(element.dataset.price);
-                if (!price || price <= 0) return;
-                currencyOptions.forEach(opt => opt.classList.remove('active'));
-                element.classList.add('active');
-                const currency = element.dataset.currency;
-                state.selectedCurrency = currency;
-                paymentDetails.classList.add('show');
-                detailAmount.textContent = price + ' ' + currency;
-                loadWalletAddress(currency);
-                submitBtn.disabled = !screenshotInput.files || screenshotInput.files.length === 0;
-            }
-
-            async function loadWalletAddress(currency) {
-                try {
-                    const settings = await apiFetch('/admin/settings');
-                    const key = currency.toLowerCase() + '_wallet';
-                    const address = settings[key] || '';
-                    if (address) {
-                        walletAddress.textContent = address;
-                        walletAddress.dataset.address = address;
-                        copyWalletBtn.style.display = 'inline-block';
-                    } else {
-                        walletAddress.textContent = '❌ Кошелек не настроен';
-                        walletAddress.dataset.address = '';
-                        copyWalletBtn.style.display = 'none';
-                        showError('Кошелек для ' + currency + ' не настроен в админке');
-                        submitBtn.disabled = true;
-                    }
-                } catch (error) {
-                    console.error('Ошибка загрузки настроек:', error);
-                    walletAddress.textContent = '❌ Ошибка загрузки';
-                    walletAddress.dataset.address = '';
-                    copyWalletBtn.style.display = 'none';
-                }
-            }
-
-            copyWalletBtn.addEventListener('click', function() {
-                const address = walletAddress.dataset.address;
-                if (!address) return;
-                navigator.clipboard.writeText(address).then(() => {
-                    this.textContent = '✅';
-                    setTimeout(() => { this.textContent = '📋'; }, 2000);
-                }).catch(() => {
-                    const textarea = document.createElement('textarea');
-                    textarea.value = address;
-                    document.body.appendChild(textarea);
-                    textarea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textarea);
-                    this.textContent = '✅';
-                    setTimeout(() => { this.textContent = '📋'; }, 2000);
-                });
-            });
-
-            currencyOptions.forEach(opt => {
-                opt.addEventListener('click', function() {
-                    const price = parseFloat(this.dataset.price);
-                    if (!price || price <= 0) { showError('Этот способ оплаты недоступен'); return; }
-                    selectCurrency(this);
-                });
-            });
-
-            screenshotInput.addEventListener('change', function() {
-                const file = this.files[0];
-                if (!file) {
-                    screenshotPreview.classList.remove('show');
-                    state.screenshotFile = null;
-                    submitBtn.disabled = true;
-                    return;
-                }
-                const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-                if (!allowedTypes.includes(file.type)) {
-                    showError('Некорректный формат файла. Поддерживаются: JPG, PNG, GIF, WEBP');
-                    this.value = '';
-                    screenshotPreview.classList.remove('show');
-                    state.screenshotFile = null;
-                    submitBtn.disabled = true;
-                    return;
-                }
-                if (file.size > 5 * 1024 * 1024) {
-                    showError('Файл слишком большой. Максимум 5 МБ.');
-                    this.value = '';
-                    screenshotPreview.classList.remove('show');
-                    state.screenshotFile = null;
-                    submitBtn.disabled = true;
-                    return;
-                }
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    screenshotImg.src = e.target.result;
-                    screenshotPreview.classList.add('show');
-                };
-                reader.readAsDataURL(file);
-                state.screenshotFile = file;
-                submitBtn.disabled = !state.selectedCurrency || !state.screenshotFile;
-            });
-
-            submitBtn.addEventListener('click', async function(e) {
-                e.preventDefault();
-                if (state.isSubmitting) return;
-                if (!state.selectedCurrency) { showError('Выберите валюту оплаты'); return; }
-                if (!state.screenshotFile) { showError('Загрузите скриншот оплаты'); return; }
-
-                state.isSubmitting = true;
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<span class="loading-spinner"></span> Отправка...';
-                hideError();
-
-                const formData = new FormData();
-                formData.append('profile_id', state.profileId);
-                formData.append('plan_id', state.planId);
-                formData.append('currency', state.selectedCurrency);
-                formData.append('screenshot', state.screenshotFile);
-                if (txidInput.value.trim()) formData.append('txid', txidInput.value.trim());
-
-                try {
-                    const response = await fetch('/api/payments/create', { method: 'POST', body: formData });
-                    const result = await response.json();
-                    if (!response.ok) throw new Error(result.error || 'Ошибка создания платежа');
-                    window.location.href = 'success.html?payment_id=' + result.id;
-                } catch (error) {
-                    console.error('Ошибка:', error);
-                    showError(error.message || 'Ошибка при отправке платежа');
-                    state.isSubmitting = false;
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '✅ Оплатил, отправить на модерацию';
-                }
-            });
-
-            async function loadExchangeSettings() {
-                try {
-                    const settings = await apiFetch('/admin/settings');
-                    const username = settings.telegram_exchange_username || '';
-                    if (username) {
-                        exchangeLink.href = 'https://t.me/' + username.replace('@', '');
-                    } else {
-                        exchangeLink.href = '#';
-                        exchangeLink.textContent = '💱 Обмен временно недоступен';
-                        exchangeLink.style.opacity = '0.6';
-                        exchangeLink.style.cursor = 'default';
-                    }
-                } catch (error) {
-                    console.error('Ошибка загрузки настроек обменника:', error);
-                }
-            }
-
-            function showError(message) {
-                paymentError.textContent = message;
-                paymentError.style.display = 'block';
-            }
-
-            function hideError() {
-                paymentError.style.display = 'none';
-            }
-
-            document.addEventListener('DOMContentLoaded', function() {
-                initBurger();
-                loadProfile();
-                loadExchangeSettings();
-            });
-
-        })();
-    </script>
+    <script src="/frontend/app.js"></script>
 </body>
 </html>
