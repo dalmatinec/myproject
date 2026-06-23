@@ -168,6 +168,7 @@ CREATE TABLE stats (
     profile_id INT NULL,
 
     action ENUM(
+        'main_view',
         'profile_view',
         'card_open',
         'telegram_click',
