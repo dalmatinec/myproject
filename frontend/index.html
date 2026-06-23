@@ -1,327 +1,201 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WeToo — Платформа проверенных анкет</title>
-    <meta name="description" content="Платформа проверенных анкет. Найди проверенных специалистов в своем городе." />
-    <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrivatClub - Премиальный клуб знакомств</title>
+    <meta name="description" content="PrivatClub - элитное сообщество для знакомств. Только проверенные анкеты, конфиденциальность и премиальный сервис.">
+    <link rel="stylesheet" href="/frontend/style.css">
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
 </head>
 <body>
-
-    <!-- ===== HEADER ===== -->
-    <header class="header">
-        <div class="container header-inner">
+    <header id="main-header" role="banner">
+        <div class="container header-container">
             <div class="logo">
-                <a href="index.html">WeToo</a>
+                <a href="/frontend/index.html" aria-label="PrivatClub">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="4" y="4" width="32" height="32" rx="8" stroke="#6C63FF" stroke-width="2"/>
+                        <path d="M20 10L22.5 17.5L30 18L24 23L25.5 30.5L20 26.5L14.5 30.5L16 23L10 18L17.5 17.5L20 10Z" fill="#6C63FF"/>
+                    </svg>
+                    <span>PrivatClub</span>
+                </a>
             </div>
-            <button class="burger" id="burgerBtn" aria-label="Меню">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <nav class="nav" id="mainNav">
-                <ul>
-                    <li><a href="index.html" class="active">Главная</a></li>
-                    <li><a href="profiles.html">Анкеты</a></li>
-                    <li><a href="news.html">Новости</a></li>
-                    <li><a href="contacts.html">Контакты</a></li>
-                    <li><a href="about.html">О нас</a></li>
+            
+            <nav id="main-nav" role="navigation" aria-label="Главная навигация">
+                <ul class="nav-menu">
+                    <li><a href="/frontend/index.html" class="active">Главная</a></li>
+                    <li><a href="/frontend/profiles.html">Анкеты</a></li>
+                    <li><a href="/frontend/news.html">Новости</a></li>
+                    <li><a href="/frontend/contacts.html">Контакты</a></li>
+                    <li><a href="/frontend/about.html">О нас</a></li>
                 </ul>
-                <a href="add-profile.html" class="btn btn-primary btn-sm">➕ Подать анкету</a>
             </nav>
+            
+            <div class="header-actions">
+                <button class="lang-toggle" data-lang="ru" aria-label="Русский язык">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M10 1C7 1 4 4 4 10C4 16 7 19 10 19" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M10 1C13 1 16 4 16 10C16 16 13 19 10 19" stroke="currentColor" stroke-width="1.5"/>
+                        <line x1="1" y1="10" x2="19" y2="10" stroke="currentColor" stroke-width="1.5"/>
+                    </svg>
+                </button>
+                <button class="lang-toggle" data-lang="en" aria-label="English language">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5"/>
+                        <line x1="1" y1="10" x2="19" y2="10" stroke="currentColor" stroke-width="1.5"/>
+                        <line x1="10" y1="1" x2="10" y2="19" stroke="currentColor" stroke-width="1.5"/>
+                    </svg>
+                </button>
+                <a href="/frontend/login.html" class="btn-login" aria-label="Войти">Войти</a>
+                <button class="burger-menu" aria-label="Открыть меню" aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
         </div>
     </header>
 
-    <!-- ===== HERO ===== -->
-    <section class="hero">
-        <div class="container hero-inner">
-            <h1 class="hero-title">WeToo</h1>
-            <p class="hero-subtitle">Платформа проверенных анкет</p>
-            <p class="hero-description">Найди проверенных специалистов в своем городе</p>
-            <a href="add-profile.html" class="btn btn-primary btn-lg">➕ Подать анкету</a>
-
-            <!-- Поиск по городам -->
-            <div class="hero-search">
-                <select id="heroCitySearch" class="hero-search-select">
-                    <option value="">Все города</option>
-                </select>
-                <button class="btn btn-secondary" id="heroSearchBtn">🔍 Найти</button>
+    <main id="main-content" role="main">
+        <!-- HERO БЛОК -->
+        <section id="hero-section" class="hero">
+            <div class="container hero-container">
+                <div class="hero-content">
+                    <h1 class="hero-title" data-translate="hero_title">Элитное сообщество для<br>премиальных знакомств</h1>
+                    <p class="hero-subtitle" data-translate="hero_subtitle">Только проверенные анкеты. Конфиденциальность. Высокий статус.</p>
+                    <div class="hero-buttons">
+                        <a href="/frontend/profiles.html" class="btn btn-primary">Смотреть анкеты</a>
+                        <a href="/frontend/add-profile.html" class="btn btn-secondary">➕ Подать анкету</a>
+                    </div>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number" id="stat-profiles">0</span>
+                        <span class="stat-label" data-translate="stat_profiles">Анкет</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="stat-vip">0</span>
+                        <span class="stat-label" data-translate="stat_vip">VIP</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="stat-views">0</span>
+                        <span class="stat-label" data-translate="stat_views">Просмотров</span>
+                    </div>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- ===== VIP КАРУСЕЛЬ ===== -->
-    <section class="vip-section">
+        <!-- КАК ЭТО РАБОТАЕТ -->
+        <section id="how-it-works" class="how-it-works">
+            <div class="container">
+                <h2 class="section-title" data-translate="how_title">Как это работает</h2>
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-number">01</div>
+                        <h3 data-translate="step1_title">Подача анкеты</h3>
+                        <p data-translate="step1_desc">Заполните анкету и добавьте до 5 фотографий. Модерация занимает до 24 часов.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">02</div>
+                        <h3 data-translate="step2_title">Выбор тарифа</h3>
+                        <p data-translate="step2_desc">Выберите подходящий тариф — обычный или VIP для повышенной видимости.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">03</div>
+                        <h3 data-translate="step3_title">Оплата</h3>
+                        <p data-translate="step3_desc">Оплатите размещение в криптовалюте — BTC, ETH или USDT.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">04</div>
+                        <h3 data-translate="step4_title">Активный статус</h3>
+                        <p data-translate="step4_desc">После подтверждения платежа анкета становится активной и доступна для просмотра.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIP КАРУСЕЛЬ -->
+        <section id="vip-section" class="vip-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title" data-translate="vip_title">VIP анкеты</h2>
+                    <a href="/frontend/profiles.html?vip=1" class="link-more">Все VIP →</a>
+                </div>
+                <div class="carousel-wrapper" id="vip-carousel">
+                    <div class="carousel-container" id="vip-profiles-container">
+                        <!-- Динамический рендеринг через JavaScript -->
+                    </div>
+                    <button class="carousel-btn carousel-prev" aria-label="Предыдущий">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M15 18L9 12L15 6"/>
+                        </svg>
+                    </button>
+                    <button class="carousel-btn carousel-next" aria-label="Следующий">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 18L15 12L9 6"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ПОСЛЕДНИЕ НОВОСТИ -->
+        <section id="news-section" class="news-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title" data-translate="news_title">Последние новости</h2>
+                    <a href="/frontend/news.html" class="link-more">Все новости →</a>
+                </div>
+                <div class="news-grid" id="news-container">
+                    <!-- Динамический рендеринг через JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- КОНТАКТЫ -->
+        <section id="contacts-section" class="contacts-section">
+            <div class="container">
+                <h2 class="section-title" data-translate="contacts_title">Свяжитесь с нами</h2>
+                <div class="contacts-grid" id="contacts-container">
+                    <!-- Динамический рендеринг через JavaScript -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ПОДВАЛ -->
+    <footer id="main-footer" role="contentinfo">
         <div class="container">
-            <h2 class="section-title">⭐ VIP анкеты</h2>
-
-            <div class="carousel-container" id="vipCarousel">
-                <div class="carousel-track" id="carouselTrack">
-                    <!-- Загружается через JS -->
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <a href="/frontend/index.html">
+                        <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="4" y="4" width="32" height="32" rx="8" stroke="#6C63FF" stroke-width="2"/>
+                            <path d="M20 10L22.5 17.5L30 18L24 23L25.5 30.5L20 26.5L14.5 30.5L16 23L10 18L17.5 17.5L20 10Z" fill="#6C63FF"/>
+                        </svg>
+                        <span>PrivatClub</span>
+                    </a>
                 </div>
-
-                <button class="carousel-btn carousel-btn-prev" id="carouselPrev">‹</button>
-                <button class="carousel-btn carousel-btn-next" id="carouselNext">›</button>
-            </div>
-
-            <div class="carousel-dots" id="carouselDots">
-                <!-- Генерируются через JS -->
-            </div>
-
-            <!-- Если нет VIP анкет -->
-            <div class="vip-empty" id="vipEmpty" style="display:none;">
-                <div class="vip-empty-icon">🌟</div>
-                <h3>Пока нет VIP анкет</h3>
-                <p>Стань первым! Создай анкету с VIP-тарифом.</p>
-                <a href="add-profile.html" class="btn btn-primary">Создать анкету</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== КАК ЭТО РАБОТАЕТ ===== -->
-    <section class="how-it-works">
-        <div class="container">
-            <h2 class="section-title">Как это работает</h2>
-            <div class="steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <div class="step-icon">📝</div>
-                    <h3>Создай анкету</h3>
-                    <p>Заполни информацию о себе, загрузи фото и выбери тариф</p>
+                <div class="footer-links">
+                    <ul>
+                        <li><a href="/frontend/index.html">Главная</a></li>
+                        <li><a href="/frontend/profiles.html">Анкеты</a></li>
+                        <li><a href="/frontend/news.html">Новости</a></li>
+                        <li><a href="/frontend/contacts.html">Контакты</a></li>
+                        <li><a href="/frontend/about.html">О нас</a></li>
+                    </ul>
                 </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <div class="step-icon">💰</div>
-                    <h3>Оплати криптовалютой</h3>
-                    <p>Оплати размещение BTC, ETH или USDT</p>
+                <div class="footer-contacts" id="footer-contacts">
+                    <!-- Динамический рендеринг через JavaScript -->
                 </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div class="step-icon">✅</div>
-                    <h3>Пройди модерацию</h3>
-                    <p>Администратор проверит анкету и опубликует</p>
+                <div class="footer-copy">
+                    <p>&copy; <span id="footer-year">2026</span> PrivatClub. Все права защищены.</p>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== FOOTER ===== -->
-    <footer class="footer">
-        <div class="container footer-inner">
-            <div class="footer-brand">
-                <div class="logo">WeToo</div>
-                <p>Платформа проверенных анкет</p>
-            </div>
-            <div class="footer-links">
-                <a href="index.html">Главная</a>
-                <a href="profiles.html">Анкеты</a>
-                <a href="news.html">Новости</a>
-                <a href="contacts.html">Контакты</a>
-                <a href="about.html">О нас</a>
-            </div>
-            <div class="footer-copy">
-                © 2026 WeToo. Все права защищены.
             </div>
         </div>
     </footer>
 
-    <!-- ===== МОДАЛЬНОЕ ОКНО АНКЕТЫ ===== -->
-    <div class="modal-overlay" id="profileModal">
-        <div class="modal">
-            <button class="modal-close" id="modalClose">✕</button>
-            <div class="modal-body" id="modalBody">
-                <!-- Загружается через JS -->
-            </div>
-        </div>
-    </div>
-
-    <script src="assets.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            loadCitiesForSearch();
-            loadVipProfiles();
-            initBurger();
-            initModal();
-
-            document.getElementById('heroSearchBtn').addEventListener('click', function() {
-                const cityId = document.getElementById('heroCitySearch').value;
-                window.location.href = cityId ? 'profiles.html?city=' + cityId : 'profiles.html';
-            });
-        });
-
-        function loadCitiesForSearch() {
-            fetch('/api/profiles/cities')
-                .then(res => res.json())
-                .then(cities => {
-                    const select = document.getElementById('heroCitySearch');
-                    cities.forEach(city => {
-                        const option = document.createElement('option');
-                        option.value = city.id;
-                        option.textContent = city.name;
-                        select.appendChild(option);
-                    });
-                })
-                .catch(() => {});
-        }
-
-        function loadVipProfiles() {
-            const track = document.getElementById('carouselTrack');
-            const dots = document.getElementById('carouselDots');
-            const empty = document.getElementById('vipEmpty');
-
-            fetch('/api/profiles?vip=1&limit=20')
-                .then(res => res.json())
-                .then(data => {
-                    const profiles = data.data || [];
-                    if (profiles.length === 0) {
-                        track.style.display = 'none';
-                        document.querySelector('.carousel-container').style.display = 'none';
-                        empty.style.display = 'block';
-                        return;
-                    }
-                    empty.style.display = 'none';
-                    renderVipCarousel(profiles);
-                })
-                .catch(() => {
-                    empty.style.display = 'block';
-                });
-        }
-
-        function renderVipCarousel(profiles) {
-            const track = document.getElementById('carouselTrack');
-            const dots = document.getElementById('carouselDots');
-            track.innerHTML = '';
-            dots.innerHTML = '';
-
-            profiles.forEach((profile, index) => {
-                const card = document.createElement('div');
-                card.className = 'carousel-slide' + (index === 0 ? ' active' : '');
-                card.dataset.index = index;
-
-                const photo = profile.photo_urls && profile.photo_urls.length > 0
-                    ? '/images/' + profile.photo_urls[0]
-                    : '/images/default-avatar.png';
-
-                card.innerHTML = `
-                    <div class="carousel-card">
-                        <img src="${photo}" alt="${profile.name}" class="carousel-card-img" />
-                        <div class="carousel-card-body">
-                            <h3 class="carousel-card-name">${profile.name}, ${profile.age}</h3>
-                            <p class="carousel-card-city">${profile.city_name || 'Город не указан'}</p>
-                            <p class="carousel-card-desc">${profile.description ? profile.description.substring(0, 80) + '...' : ''}</p>
-                            ${profile.price ? `<p class="carousel-card-price">от ${profile.price} ₽</p>` : ''}
-                            <button class="btn btn-primary btn-sm" onclick="openProfileModal(${profile.id})">Подробнее</button>
-                        </div>
-                    </div>
-                `;
-                track.appendChild(card);
-
-                const dot = document.createElement('span');
-                dot.className = 'carousel-dot' + (index === 0 ? ' active' : '');
-                dot.dataset.index = index;
-                dot.addEventListener('click', () => goToSlide(index));
-                dots.appendChild(dot);
-            });
-
-            let currentIndex = 0;
-            let autoPlayInterval = null;
-
-            document.getElementById('carouselPrev').addEventListener('click', () => {
-                goToSlide(currentIndex - 1);
-                resetAutoPlay();
-            });
-            document.getElementById('carouselNext').addEventListener('click', () => {
-                goToSlide(currentIndex + 1);
-                resetAutoPlay();
-            });
-
-            document.querySelectorAll('.carousel-slide').forEach(slide => {
-                slide.addEventListener('click', () => resetAutoPlay());
-            });
-
-            function goToSlide(index) {
-                const slides = document.querySelectorAll('.carousel-slide');
-                const dots = document.querySelectorAll('.carousel-dot');
-                if (index < 0) index = slides.length - 1;
-                if (index >= slides.length) index = 0;
-                slides.forEach((s, i) => {
-                    s.classList.toggle('active', i === index);
-                    s.style.transform = 'translateX(' + ((i - index) * 100) + '%)';
-                });
-                dots.forEach((d, i) => {
-                    d.classList.toggle('active', i === index);
-                });
-                currentIndex = index;
-            }
-
-            function resetAutoPlay() {
-                if (autoPlayInterval) {
-                    clearInterval(autoPlayInterval);
-                    autoPlayInterval = null;
-                }
-            }
-
-            function startAutoPlay() {
-                autoPlayInterval = setInterval(() => {
-                    goToSlide(currentIndex + 1);
-                }, 4000);
-            }
-
-            goToSlide(0);
-            setTimeout(startAutoPlay, 3000);
-        }
-
-        function initBurger() {
-            const burger = document.getElementById('burgerBtn');
-            const nav = document.getElementById('mainNav');
-            burger.addEventListener('click', () => {
-                nav.classList.toggle('open');
-                burger.classList.toggle('active');
-            });
-        }
-
-        function initModal() {
-            const modal = document.getElementById('profileModal');
-            const close = document.getElementById('modalClose');
-            close.addEventListener('click', () => modal.classList.remove('open'));
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) modal.classList.remove('open');
-            });
-        }
-
-        function openProfileModal(id) {
-            const modal = document.getElementById('profileModal');
-            const body = document.getElementById('modalBody');
-            body.innerHTML = '<p style="text-align:center;">Загрузка...</p>';
-            modal.classList.add('open');
-
-            fetch('/api/profiles/' + id)
-                .then(res => res.json())
-                .then(profile => {
-                    const photos = profile.photo_urls && profile.photo_urls.length > 0
-                        ? profile.photo_urls.map(url => `<img src="/images/${url}" alt="Фото" />`).join('')
-                        : '<p>Нет фото</p>';
-                    body.innerHTML = `
-                        <div class="modal-profile">
-                            <div class="modal-photos">${photos}</div>
-                            <h2>${profile.name}, ${profile.age}</h2>
-                            <p><strong>Город:</strong> ${profile.city_name || 'Не указан'}</p>
-                            <p><strong>Описание:</strong> ${profile.description || ''}</p>
-                            ${profile.price ? `<p><strong>Цена:</strong> от ${profile.price} ₽</p>` : ''}
-                            <p><strong>Telegram:</strong> <a href="https://t.me/${profile.telegram.replace('@', '')}" target="_blank">${profile.telegram}</a></p>
-                            ${profile.whatsapp ? `<p><strong>WhatsApp:</strong> <a href="https://wa.me/${profile.whatsapp.replace(/[^0-9]/g, '')}" target="_blank">${profile.whatsapp}</a></p>` : ''}
-                            <a href="https://t.me/${profile.telegram.replace('@', '')}" target="_blank" class="btn btn-primary">💬 Связаться</a>
-                        </div>
-                    `;
-                })
-                .catch(() => {
-                    body.innerHTML = '<p style="text-align:center;color:red;">Ошибка загрузки анкеты</p>';
-                });
-        }
-
-        // Глобально для onclick в HTML
-        window.openProfileModal = openProfileModal;
-    </script>
+    <script src="/frontend/app.js"></script>
 </body>
 </html>
