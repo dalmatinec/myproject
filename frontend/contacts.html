@@ -1,193 +1,272 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Контакты — WeToo</title>
-    <meta name="description" content="Контакты платформы WeToo" />
-    <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Контакты - PrivatClub</title>
+    <meta name="description" content="Контакты администрации PrivatClub. Свяжитесь с нами через Telegram, Email или форму обратной связи.">
+    <link rel="stylesheet" href="/frontend/style.css">
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
 </head>
 <body>
+    <!-- ОВЕРЛЕЙ ДЛЯ МЕНЮ -->
+    <div id="menu-overlay"></div>
 
-    <!-- ===== HEADER ===== -->
-    <header class="header">
-        <div class="container header-inner">
+    <!-- ШАПКА -->
+    <header id="main-header" role="banner">
+        <div class="container header-container">
             <div class="logo">
-                <a href="index.html">WeToo</a>
+                <a href="/frontend/index.html" aria-label="PrivatClub">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="4" y="4" width="32" height="32" rx="8" stroke="#6C63FF" stroke-width="2"/>
+                        <path d="M20 10L22.5 17.5L30 18L24 23L25.5 30.5L20 26.5L14.5 30.5L16 23L10 18L17.5 17.5L20 10Z" fill="#6C63FF"/>
+                    </svg>
+                    <span>PrivatClub</span>
+                </a>
             </div>
-            <button class="burger" id="burgerBtn" aria-label="Меню">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <nav class="nav" id="mainNav">
-                <ul>
-                    <li><a href="index.html">Главная</a></li>
-                    <li><a href="profiles.html">Анкеты</a></li>
-                    <li><a href="news.html">Новости</a></li>
-                    <li><a href="contacts.html" class="active">Контакты</a></li>
-                    <li><a href="about.html">О нас</a></li>
+            
+            <nav id="main-nav" role="navigation" aria-label="Главная навигация">
+                <ul class="nav-menu">
+                    <li>
+                        <a href="/frontend/index.html">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M2 10L10 3L18 10V17C18 17.5523 17.5523 18 17 18H3C2.44772 18 2 17.5523 2 17V10Z"/>
+                                <path d="M7 14V18H13V14H7Z"/>
+                            </svg>
+                            Главная
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/frontend/profiles.html">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="7" cy="7" r="4"/>
+                                <circle cx="15" cy="15" r="3"/>
+                                <path d="M3 17C5 15 9 15 11 17"/>
+                            </svg>
+                            Анкеты
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/frontend/news.html">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="3" y="4" width="14" height="12" rx="1"/>
+                                <line x1="6" y1="8" x2="14" y2="8"/>
+                                <line x1="6" y1="11" x2="12" y2="11"/>
+                                <line x1="6" y1="14" x2="10" y2="14"/>
+                            </svg>
+                            Новости
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/frontend/contacts.html" class="active">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M2 4C2 3.44772 2.44772 3 3 3H17C17.5523 3 18 3.44772 18 4V16C18 16.5523 17.5523 17 17 17H3C2.44772 17 2 16.5523 2 16V4Z"/>
+                                <path d="M2 5L10 11L18 5"/>
+                            </svg>
+                            Контакты
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/frontend/about.html">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="10" cy="7" r="3"/>
+                                <path d="M3 17C5 13 15 13 17 17"/>
+                                <circle cx="10" cy="10" r="9"/>
+                            </svg>
+                            О нас
+                        </a>
+                    </li>
                 </ul>
-                <a href="add-profile.html" class="btn btn-primary btn-sm">➕ Подать анкету</a>
             </nav>
+            
+            <div class="header-actions">
+                <button class="lang-toggle" data-lang="ru" aria-label="Русский язык">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M10 1C7 1 4 4 4 10C4 16 7 19 10 19" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M10 1C13 1 16 4 16 10C16 16 13 19 10 19" stroke="currentColor" stroke-width="1.5"/>
+                        <line x1="1" y1="10" x2="19" y2="10" stroke="currentColor" stroke-width="1.5"/>
+                    </svg>
+                </button>
+                <button class="lang-toggle" data-lang="en" aria-label="English language">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5"/>
+                        <line x1="1" y1="10" x2="19" y2="10" stroke="currentColor" stroke-width="1.5"/>
+                        <line x1="10" y1="1" x2="10" y2="19" stroke="currentColor" stroke-width="1.5"/>
+                    </svg>
+                </button>
+                <button class="burger-menu" aria-label="Открыть меню" aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
         </div>
     </header>
 
-    <!-- ===== КОНТАКТЫ ===== -->
-    <section class="contacts-page">
+    <!-- МОБИЛЬНОЕ МЕНЮ -->
+    <div id="mobile-menu" role="dialog" aria-label="Мобильная навигация" aria-modal="true">
+        <button class="menu-close" aria-label="Закрыть меню">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </button>
+        <nav role="navigation">
+            <ul class="mobile-nav-menu">
+                <li>
+                    <a href="/frontend/index.html">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M2 10L10 3L18 10V17C18 17.5523 17.5523 18 17 18H3C2.44772 18 2 17.5523 2 17V10Z"/>
+                            <path d="M7 14V18H13V14H7Z"/>
+                        </svg>
+                        Главная
+                    </a>
+                </li>
+                <li>
+                    <a href="/frontend/profiles.html">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="7" cy="7" r="4"/>
+                            <circle cx="15" cy="15" r="3"/>
+                            <path d="M3 17C5 15 9 15 11 17"/>
+                        </svg>
+                        Анкеты
+                    </a>
+                </li>
+                <li>
+                    <a href="/frontend/news.html">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <rect x="3" y="4" width="14" height="12" rx="1"/>
+                            <line x1="6" y1="8" x2="14" y2="8"/>
+                            <line x1="6" y1="11" x2="12" y2="11"/>
+                            <line x1="6" y1="14" x2="10" y2="14"/>
+                        </svg>
+                        Новости
+                    </a>
+                </li>
+                <li>
+                    <a href="/frontend/contacts.html" class="active">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M2 4C2 3.44772 2.44772 3 3 3H17C17.5523 3 18 3.44772 18 4V16C18 16.5523 17.5523 17 17 17H3C2.44772 17 2 16.5523 2 16V4Z"/>
+                            <path d="M2 5L10 11L18 5"/>
+                        </svg>
+                        Контакты
+                    </a>
+                </li>
+                <li>
+                    <a href="/frontend/about.html">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="10" cy="7" r="3"/>
+                            <path d="M3 17C5 13 15 13 17 17"/>
+                            <circle cx="10" cy="10" r="9"/>
+                        </svg>
+                        О нас
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- ОСНОВНОЙ КОНТЕНТ -->
+    <main id="main-content" role="main">
+        <!-- ЗАГОЛОВОК СТРАНИЦЫ -->
+        <section class="page-header">
+            <div class="container">
+                <h1 class="page-title" data-translate="contacts_title">Контакты</h1>
+                <p class="page-subtitle" data-translate="contacts_subtitle">Свяжитесь с администрацией PrivatClub или оставьте сообщение</p>
+            </div>
+        </section>
+
+        <!-- КОНТАКТЫ -->
+        <section id="contacts-section" class="contacts-section-page">
+            <div class="container">
+                <div class="contacts-two-columns">
+                    <!-- ЛЕВАЯ КОЛОНКА: ИНФОРМАЦИЯ -->
+                    <div class="contacts-info" id="contacts-info">
+                        <div class="contact-item">
+                            <span class="contact-label" data-translate="contact_telegram_label">Telegram</span>
+                            <span class="contact-value" id="contact-telegram" data-translate="contact_telegram_placeholder">@privatclub_support</span>
+                        </div>
+                        <div class="contact-item">
+                            <span class="contact-label" data-translate="contact_email_label">Email поддержки</span>
+                            <span class="contact-value" id="contact-email" data-translate="contact_email_placeholder">support@privatclub.com</span>
+                        </div>
+                        <div class="contact-item">
+                            <span class="contact-label" data-translate="contact_workhours_label">Часы работы</span>
+                            <span class="contact-value" id="contact-workhours" data-translate="contact_workhours_placeholder">10:00 - 22:00 (МСК)</span>
+                        </div>
+                    </div>
+
+                    <!-- ПРАВАЯ КОЛОНКА: ФОРМА -->
+                    <div class="contacts-form">
+                        <form id="feedback-form" novalidate>
+                            <div class="form-group">
+                                <label for="feedback-name" data-translate="form_name_label">Ваше имя</label>
+                                <input type="text" id="feedback-name" name="name" required data-translate-placeholder="form_name_placeholder">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="feedback-email" data-translate="form_email_label">Email</label>
+                                <input type="email" id="feedback-email" name="email" required data-translate-placeholder="form_email_placeholder">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="feedback-subject" data-translate="form_subject_label">Тема</label>
+                                <input type="text" id="feedback-subject" name="subject" required data-translate-placeholder="form_subject_placeholder">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="feedback-message" data-translate="form_message_label">Сообщение</label>
+                                <textarea id="feedback-message" name="message" rows="5" required data-translate-placeholder="form_message_placeholder"></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary" id="btn-send-feedback" data-translate="form_send_btn">Отправить сообщение</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ПОДВАЛ -->
+    <footer id="main-footer" role="contentinfo">
         <div class="container">
-            <div class="contacts-card">
-                <h1>📞 Контакты</h1>
-                <p class="subtitle">Свяжитесь с нами любым удобным способом</p>
-
-                <!-- Поддержка -->
-                <div class="contact-item" id="contactSupport">
-                    <div class="contact-icon">💬</div>
-                    <div class="contact-info">
-                        <div class="label">Поддержка</div>
-                        <div class="value" id="supportUsername">Загрузка...</div>
-                    </div>
-                    <a href="#" id="supportLink" class="btn btn-primary btn-sm contact-btn" target="_blank">Написать</a>
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <a href="/frontend/index.html">
+                        <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="4" y="4" width="32" height="32" rx="8" stroke="#6C63FF" stroke-width="2"/>
+                            <path d="M20 10L22.5 17.5L30 18L24 23L25.5 30.5L20 26.5L14.5 30.5L16 23L10 18L17.5 17.5L20 10Z" fill="#6C63FF"/>
+                        </svg>
+                        <span>PrivatClub</span>
+                    </a>
                 </div>
-
-                <!-- Новостной канал -->
-                <div class="contact-item" id="contactChannel">
-                    <div class="contact-icon">📰</div>
-                    <div class="contact-info">
-                        <div class="label">Новостной канал</div>
-                        <div class="value" id="channelUsername">Загрузка...</div>
-                    </div>
-                    <a href="#" id="channelLink" class="btn btn-secondary btn-sm contact-btn" target="_blank">Подписаться</a>
+                <div class="footer-links">
+                    <ul>
+                        <li><a href="/frontend/index.html">Главная</a></li>
+                        <li><a href="/frontend/profiles.html">Анкеты</a></li>
+                        <li><a href="/frontend/news.html">Новости</a></li>
+                        <li><a href="/frontend/contacts.html">Контакты</a></li>
+                        <li><a href="/frontend/about.html">О нас</a></li>
+                    </ul>
                 </div>
-
-                <!-- Обменник -->
-                <div class="contact-item" id="contactExchange">
-                    <div class="contact-icon">💱</div>
-                    <div class="contact-info">
-                        <div class="label">Помощь с обменом криптовалюты</div>
-                        <div class="value" id="exchangeUsername">Загрузка...</div>
-                    </div>
-                    <a href="#" id="exchangeLink" class="btn btn-primary btn-sm contact-btn" target="_blank">Связаться</a>
+                <div class="footer-contacts" id="footer-contacts">
+                    <!-- Динамический рендеринг через JavaScript -->
                 </div>
-
-                <!-- Email (если есть в настройках) -->
-                <div class="contact-item" id="contactEmail" style="display:none;">
-                    <div class="contact-icon">📧</div>
-                    <div class="contact-info">
-                        <div class="label">Email</div>
-                        <div class="value" id="emailValue">—</div>
-                    </div>
-                    <a href="#" id="emailLink" class="btn btn-secondary btn-sm contact-btn" target="_blank">Написать</a>
+                <div class="footer-copy">
+                    <p>&copy; <span id="footer-year">2026</span> PrivatClub. Все права защищены.</p>
                 </div>
-
-                <div style="margin-top:24px;padding:16px;background:var(--bg);border-radius:var(--radius-sm);text-align:center;color:var(--text-secondary);font-size:14px;">
-                    📱 Все контакты обновляются автоматически из настроек сайта
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== FOOTER ===== -->
-    <footer class="footer">
-        <div class="container footer-inner">
-            <div class="footer-brand">
-                <div class="logo">WeToo</div>
-                <p>Платформа проверенных анкет</p>
-            </div>
-            <div class="footer-links">
-                <a href="index.html">Главная</a>
-                <a href="profiles.html">Анкеты</a>
-                <a href="news.html">Новости</a>
-                <a href="contacts.html">Контакты</a>
-                <a href="about.html">О нас</a>
-            </div>
-            <div class="footer-copy">
-                © 2026 WeToo. Все права защищены.
             </div>
         </div>
     </footer>
 
-    <script src="assets.js"></script>
-    <script>
-        (function() {
-            'use strict';
+    <!-- КНОПКА НАВЕРХ -->
+    <button id="btn-to-top" aria-label="Наверх">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 15L12 9L6 15"/>
+        </svg>
+    </button>
 
-            const supportUsername = document.getElementById('supportUsername');
-            const supportLink = document.getElementById('supportLink');
-            const channelUsername = document.getElementById('channelUsername');
-            const channelLink = document.getElementById('channelLink');
-            const exchangeUsername = document.getElementById('exchangeUsername');
-            const exchangeLink = document.getElementById('exchangeLink');
-            const emailValue = document.getElementById('emailValue');
-            const emailLink = document.getElementById('emailLink');
-            const contactEmail = document.getElementById('contactEmail');
-
-            // ===== ЗАГРУЗКА НАСТРОЕК =====
-            async function loadContacts() {
-                try {
-                    const settings = await apiFetch('/admin/settings');
-
-                    // Поддержка
-                    const support = settings.telegram_support_username || '';
-                    if (support) {
-                        supportUsername.textContent = '@' + support.replace('@', '');
-                        supportLink.href = 'https://t.me/' + support.replace('@', '');
-                        supportLink.textContent = '💬 Написать';
-                    } else {
-                        supportUsername.textContent = 'Не настроен';
-                        supportLink.href = '#';
-                        supportLink.textContent = '—';
-                        supportLink.style.opacity = '0.5';
-                        supportLink.style.cursor = 'default';
-                    }
-
-                    // Канал
-                    const channel = settings.telegram_channel_username || '';
-                    if (channel) {
-                        channelUsername.textContent = '@' + channel.replace('@', '');
-                        channelLink.href = 'https://t.me/' + channel.replace('@', '');
-                        channelLink.textContent = '📰 Подписаться';
-                    } else {
-                        channelUsername.textContent = 'Не настроен';
-                        channelLink.href = '#';
-                        channelLink.textContent = '—';
-                        channelLink.style.opacity = '0.5';
-                        channelLink.style.cursor = 'default';
-                    }
-
-                    // Обменник
-                    const exchange = settings.telegram_exchange_username || '';
-                    if (exchange) {
-                        exchangeUsername.textContent = '@' + exchange.replace('@', '');
-                        exchangeLink.href = 'https://t.me/' + exchange.replace('@', '');
-                        exchangeLink.textContent = '💱 Написать';
-                    } else {
-                        exchangeUsername.textContent = 'Не настроен';
-                        exchangeLink.href = '#';
-                        exchangeLink.textContent = '—';
-                        exchangeLink.style.opacity = '0.5';
-                        exchangeLink.style.cursor = 'default';
-                    }
-
-                    // Email (если добавится в будущем)
-                    // Можно оставить скрытым, так как в текущей схеме нет email в settings
-                    contactEmail.style.display = 'none';
-
-                } catch (error) {
-                    console.error('Ошибка загрузки контактов:', error);
-                    supportUsername.textContent = '❌ Ошибка';
-                    channelUsername.textContent = '❌ Ошибка';
-                    exchangeUsername.textContent = '❌ Ошибка';
-                }
-            }
-
-            // ===== ИНИЦИАЛИЗАЦИЯ =====
-            document.addEventListener('DOMContentLoaded', function() {
-                initBurger();
-                loadContacts();
-            });
-
-        })();
-    </script>
+    <script src="/frontend/app.js"></script>
 </body>
 </html>
