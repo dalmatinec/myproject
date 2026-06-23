@@ -1,505 +1,162 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Админ-панель — WeToo</title>
-    <meta name="description" content="Панель управления WeToo" />
-    <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель управления - PrivatClub</title>
+    <meta name="description" content="Панель управления PrivatClub для администраторов.">
+    <link rel="stylesheet" href="/frontend/style.css">
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
 </head>
-<body>
-
-    <!-- ===== HEADER ===== -->
-    <header class="header">
-        <div class="container header-inner">
-            <div class="logo">
-                <a href="index.html">WeToo</a>
+<body class="admin-page">
+    <!-- ШАПКА АДМИНКИ -->
+    <header class="admin-header">
+        <div class="admin-header-container">
+            <div class="admin-header-left">
+                <div class="admin-logo">
+                    <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="4" y="4" width="32" height="32" rx="8" stroke="#6C63FF" stroke-width="2"/>
+                        <path d="M20 10L22.5 17.5L30 18L24 23L25.5 30.5L20 26.5L14.5 30.5L16 23L10 18L17.5 17.5L20 10Z" fill="#6C63FF"/>
+                    </svg>
+                    <span>PrivatClub</span>
+                </div>
+                <span class="admin-header-title" data-translate="admin_panel_title">Панель управления</span>
             </div>
-            <button class="burger" id="burgerBtn" aria-label="Меню">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <nav class="nav" id="mainNav">
-                <ul>
-                    <li><a href="index.html">Главная</a></li>
-                    <li><a href="profiles.html">Анкеты</a></li>
-                    <li><a href="news.html">Новости</a></li>
-                    <li><a href="contacts.html">Контакты</a></li>
-                    <li><a href="about.html">О нас</a></li>
-                </ul>
-                <button class="btn btn-danger btn-sm" id="adminLogoutBtn">🚪 Выйти</button>
-            </nav>
+            <div class="admin-header-right">
+                <button id="admin-logout" class="btn-logout" data-translate="admin_logout">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M13 4L18 10L13 16"/>
+                        <line x1="18" y1="10" x2="7" y2="10"/>
+                        <path d="M7 4V2H5C3.89543 2 3 2.89543 3 4V16C3 17.1046 3.89543 18 5 18H7V16"/>
+                    </svg>
+                    Выйти
+                </button>
+            </div>
         </div>
     </header>
 
-    <!-- ===== АДМИН-ПАНЕЛЬ ===== -->
-    <div class="admin-layout">
-
-        <!-- Сайдбар -->
-        <aside class="admin-sidebar" id="adminSidebar">
-            <div class="admin-menu-item active" data-tab="stats">📊 Статистика</div>
-            <div class="admin-menu-item" data-tab="profiles">👤 Анкеты</div>
-            <div class="admin-menu-item" data-tab="payments">💳 Платежи</div>
-            <div class="admin-menu-item" data-tab="cities">🏙️ Города</div>
-            <div class="admin-menu-item" data-tab="plans">💰 Тарифы</div>
-            <div class="admin-menu-item" data-tab="complaints">⚠️ Жалобы</div>
-            <div class="admin-menu-item" data-tab="admins">👥 Администраторы</div>
-            <div class="admin-menu-item" data-tab="settings">⚙️ Настройки</div>
+    <!-- ОСНОВНОЙ КОНТЕНТ АДМИНКИ -->
+    <div class="admin-body">
+        <!-- БОКОВОЕ МЕНЮ -->
+        <aside class="admin-sidebar" role="navigation" aria-label="Административная навигация">
+            <nav class="admin-nav">
+                <ul class="admin-nav-list">
+                    <li>
+                        <button class="admin-nav-btn active" data-tab="moderation" data-translate="adm_tab_mod">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="10" cy="8" r="4"/>
+                                <path d="M2 16C4 13 16 13 18 16"/>
+                                <rect x="2" y="2" width="4" height="4" rx="1"/>
+                                <rect x="14" y="2" width="4" height="4" rx="1"/>
+                            </svg>
+                            Модерация
+                        </button>
+                    </li>
+                    <li>
+                        <button class="admin-nav-btn" data-tab="wallets" data-translate="adm_tab_wallets">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="2" y="6" width="16" height="10" rx="1"/>
+                                <rect x="6" y="9" width="8" height="4" rx="1"/>
+                            </svg>
+                            Кошельки
+                        </button>
+                    </li>
+                    <li>
+                        <button class="admin-nav-btn" data-tab="add-news" data-translate="adm_tab_news">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="3" y="4" width="14" height="12" rx="1"/>
+                                <line x1="6" y1="8" x2="14" y2="8"/>
+                                <line x1="6" y1="11" x2="12" y2="11"/>
+                                <line x1="6" y1="14" x2="10" y2="14"/>
+                            </svg>
+                            Добавить новость
+                        </button>
+                    </li>
+                </ul>
+            </nav>
         </aside>
 
-        <!-- Контент -->
-        <main class="admin-content" id="adminContent">
-            <!-- Загружается через JS -->
-        </main>
+        <!-- ОСНОВНОЙ КОНТЕНТ -->
+        <main class="admin-main" role="main">
+            <!-- СЕКЦИЯ МОДЕРАЦИИ И СТАТИСТИКИ -->
+            <section id="tab-moderation" class="admin-tab active">
+                <!-- БЛОК СТАТИСТИКИ -->
+                <div class="admin-stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-card-label" data-translate="stat_total_profiles">Всего анкет</span>
+                        <span class="stat-card-number" id="stat-profiles-count">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-card-label" data-translate="stat_pending_profiles">На модерации</span>
+                        <span class="stat-card-number" id="stat-pending-count">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-card-label" data-translate="stat_total_news">Всего новостей</span>
+                        <span class="stat-card-number" id="stat-news-count">0</span>
+                    </div>
+                </div>
 
+                <!-- БЛОК МОДЕРАЦИИ -->
+                <div class="admin-tab-header">
+                    <h2 class="admin-tab-title" data-translate="adm_mod_title">Анкеты на модерацию</h2>
+                </div>
+                <div class="admin-profiles-grid" id="admin-moderation-list">
+                    <div id="admin-mod-empty" class="admin-empty" data-translate="adm_mod_empty">Нет анкет на модерацию</div>
+                </div>
+            </section>
+
+            <!-- СЕКЦИЯ КОШЕЛЬКОВ -->
+            <section id="tab-wallets" class="admin-tab" style="display: none;">
+                <div class="admin-tab-header">
+                    <h2 class="admin-tab-title" data-translate="adm_wallets_title">Настройка платежных реквизитов</h2>
+                </div>
+                <form id="admin-wallets-form" novalidate>
+                    <div class="admin-form-group">
+                        <label for="wallet-btc" class="admin-form-label" data-translate="adm_wallet_btc">Bitcoin</label>
+                        <input type="text" id="wallet-btc" name="wallet_btc" class="admin-form-input" data-translate-placeholder="adm_wallet_btc_placeholder">
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="wallet-eth" class="admin-form-label" data-translate="adm_wallet_eth">Ethereum</label>
+                        <input type="text" id="wallet-eth" name="wallet_eth" class="admin-form-input" data-translate-placeholder="adm_wallet_eth_placeholder">
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="wallet-usdt" class="admin-form-label" data-translate="adm_wallet_usdt">USDT (TRC-20)</label>
+                        <input type="text" id="wallet-usdt" name="wallet_usdt" class="admin-form-input" data-translate-placeholder="adm_wallet_usdt_placeholder">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary admin-form-submit" data-translate="adm_save_wallets">Сохранить кошельки</button>
+                </form>
+            </section>
+
+            <!-- СЕКЦИЯ НОВОСТЕЙ -->
+            <section id="tab-add-news" class="admin-tab" style="display: none;">
+                <div class="admin-tab-header">
+                    <h2 class="admin-tab-title" data-translate="adm_news_title">Публикация новости</h2>
+                </div>
+                <form id="admin-news-form" novalidate>
+                    <div class="admin-form-group">
+                        <label for="news-title" class="admin-form-label" data-translate="adm_news_title_label">Заголовок</label>
+                        <input type="text" id="news-title" name="news_title" class="admin-form-input" required data-translate-placeholder="adm_news_title_placeholder">
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="news-content" class="admin-form-label" data-translate="adm_news_content_label">Текст новости</label>
+                        <textarea id="news-content" name="news_content" class="admin-form-textarea" rows="6" required data-translate-placeholder="adm_news_content_placeholder"></textarea>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="news-image" class="admin-form-label" data-translate="adm_news_image_label">Ссылка на картинку</label>
+                        <input type="text" id="news-image" name="news_image" class="admin-form-input" data-translate-placeholder="adm_news_image_placeholder">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary admin-form-submit" data-translate="adm_publish_news">Опубликовать новость</button>
+                </form>
+            </section>
+        </main>
     </div>
 
-    <!-- ===== FOOTER ===== -->
-    <footer class="footer">
-        <div class="container footer-inner">
-            <div class="footer-brand">
-                <div class="logo">WeToo</div>
-                <p>Платформа проверенных анкет</p>
-            </div>
-            <div class="footer-links">
-                <a href="index.html">Главная</a>
-                <a href="profiles.html">Анкеты</a>
-                <a href="news.html">Новости</a>
-                <a href="contacts.html">Контакты</a>
-                <a href="about.html">О нас</a>
-            </div>
-            <div class="footer-copy">
-                © 2026 WeToo. Все права защищены.
-            </div>
-        </div>
-    </footer>
-
-    <script src="assets.js"></script>
-    <script>
-
-        (function() {
-            'use strict';
-
-            // ===== ПРОВЕРКА АВТОРИЗАЦИИ =====
-            if (!isLoggedIn()) {
-                window.location.href = 'login.html';
-                return;
-            }
-
-            const content = document.getElementById('adminContent');
-            const menuItems = document.querySelectorAll('.admin-menu-item');
-            const logoutBtn = document.getElementById('adminLogoutBtn');
-
-            let currentTab = 'stats';
-
-            menuItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    menuItems.forEach(i => i.classList.remove('active'));
-                    this.classList.add('active');
-                    currentTab = this.dataset.tab;
-                    loadTab(currentTab);
-                });
-            });
-
-            logoutBtn.addEventListener('click', function() {
-                removeToken();
-                window.location.href = 'login.html';
-            });
-
-            async function loadTab(tab) {
-                content.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-light);">⏳ Загрузка...</div>';
-                switch (tab) {
-                    case 'stats': await loadStats(); break;
-                    case 'profiles': await loadProfiles(); break;
-                    case 'payments': await loadPayments(); break;
-                    case 'cities': await loadCities(); break;
-                    case 'plans': await loadPlans(); break;
-                    case 'complaints': await loadComplaints(); break;
-                    case 'admins': await loadAdmins(); break;
-                    case 'settings': await loadSettings(); break;
-                    default: content.innerHTML = '<p style="color:var(--text-light);">Раздел в разработке</p>';
-                }
-            }
-
-            // ===== СТАТИСТИКА =====
-            async function loadStats() {
-                try {
-                    const stats = await apiFetch('/admin/stats');
-                    content.innerHTML = `
-                        <h2 class="page-title">📊 Статистика</h2>
-                        <div class="admin-stats">
-                            <div class="admin-stat-card"><div class="stat-value">${stats.total_profiles || 0}</div><div class="stat-label">Всего анкет</div></div>
-                            <div class="admin-stat-card"><div class="stat-value" style="color:#2ECC71;">${stats.active_profiles || 0}</div><div class="stat-label">Активных</div></div>
-                            <div class="admin-stat-card"><div class="stat-value" style="color:#F1C40F;">${stats.pending_profiles || 0}</div><div class="stat-label">Ожидают модерации</div></div>
-                            <div class="admin-stat-card"><div class="stat-value" style="color:#6C63FF;">${stats.vip_profiles || 0}</div><div class="stat-label">VIP анкет</div></div>
-                            <div class="admin-stat-card"><div class="stat-value">${stats.total_views || 0}</div><div class="stat-label">Всего просмотров</div></div>
-                            <div class="admin-stat-card"><div class="stat-value">${stats.total_payments || 0}</div><div class="stat-label">Всего платежей</div></div>
-                            <div class="admin-stat-card"><div class="stat-value" style="color:#F1C40F;">${stats.pending_payments || 0}</div><div class="stat-label">Ожидают подтверждения</div></div>
-                            <div class="admin-stat-card"><div class="stat-value" style="color:#E74C3C;">${stats.new_complaints || 0}</div><div class="stat-label">Новых жалоб</div></div>
-                            <div class="admin-stat-card"><div class="stat-value">${stats.active_cities || 0}</div><div class="stat-label">Активных городов</div></div>
-                            <div class="admin-stat-card"><div class="stat-value">${stats.active_admins || 0}</div><div class="stat-label">Администраторов</div></div>
-                        </div>
-                    `;
-                } catch (error) {
-                    content.innerHTML = `<p style="color:#e74c3c;">❌ Ошибка загрузки статистики: ${error.message}</p>`;
-                }
-            }
-
-            // ===== АНКЕТЫ =====
-            async function loadProfiles() {
-                try {
-                    const data = await apiFetch('/profiles/?status=pending&limit=50');
-                    const profiles = data.data || [];
-                    let html = `<h2 class="page-title">👤 Анкеты (ожидают модерации)</h2><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>ID</th><th>Имя</th><th>Возраст</th><th>Город</th><th>Статус</th><th>Действия</th></tr></thead><tbody>`;
-                    if (profiles.length === 0) {
-                        html += `<tr><td colspan="6" style="text-align:center;color:var(--text-light);padding:30px;">Нет анкет на модерации</td></tr>`;
-                    } else {
-                        profiles.forEach(p => {
-                            const status = getProfileStatus(p.status);
-                            html += `<tr><td>#${p.id}</td><td><strong>${p.name}</strong></td><td>${p.age}</td><td>${p.city_name || '—'}</td><td><span class="status-badge" style="background:${status.bg};color:${status.color};">${status.label}</span></td><td><div class="admin-actions"><button class="btn btn-success btn-sm" onclick="approveProfile(${p.id})">✅</button><button class="btn btn-danger btn-sm" onclick="rejectProfile(${p.id})">❌</button><button class="btn btn-secondary btn-sm" onclick="viewProfile(${p.id})">👁️</button></div></td></tr>`;
-                        });
-                    }
-                    html += `</tbody></table></div>`;
-                    content.innerHTML = html;
-                } catch (error) {
-                    content.innerHTML = `<p style="color:#e74c3c;">❌ Ошибка загрузки анкет: ${error.message}</p>`;
-                }
-            }
-
-            // ===== ПЛАТЕЖИ =====
-            async function loadPayments() {
-                try {
-                    const data = await apiFetch('/payments/?status=waiting&limit=50');
-                    const payments = data.data || [];
-                    let html = `<h2 class="page-title">💳 Платежи (ожидают подтверждения)</h2><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>ID</th><th>Анкета</th><th>Сумма</th><th>Валюта</th><th>Статус</th><th>Действия</th></tr></thead><tbody>`;
-                    if (payments.length === 0) {
-                        html += `<tr><td colspan="6" style="text-align:center;color:var(--text-light);padding:30px;">Нет платежей на подтверждении</td></tr>`;
-                    } else {
-                        payments.forEach(p => {
-                            const status = getPaymentStatus(p.status);
-                            html += `<tr><td>#${p.id}</td><td>${p.profile_name || '#' + p.profile_id}</td><td>${p.amount} ${p.currency}</td><td>${p.currency}</td><td><span class="status-badge" style="background:${status.bg};color:${status.color};">${status.label}</span></td><td><div class="admin-actions"><button class="btn btn-success btn-sm" onclick="confirmPayment(${p.id})">✅</button><button class="btn btn-danger btn-sm" onclick="rejectPayment(${p.id})">❌</button>${p.screenshot ? `<a href="/images/${p.screenshot}" target="_blank" class="btn btn-secondary btn-sm">📷</a>` : ''}</div></td></tr>`;
-                        });
-                    }
-                    html += `</tbody></table></div>`;
-                    content.innerHTML = html;
-                } catch (error) {
-                    content.innerHTML = `<p style="color:#e74c3c;">❌ Ошибка загрузки платежей: ${error.message}</p>`;
-                }
-            }
-
-            // ===== ГОРОДА =====
-            async function loadCities() {
-                try {
-                    const cities = await apiFetch('/admin/cities');
-                    let html = `<h2 class="page-title">🏙️ Города</h2><div style="margin-bottom:16px;"><button class="btn btn-primary btn-sm" onclick="showAddCityForm()">➕ Добавить город</button></div><div id="cityFormContainer"></div><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>ID</th><th>Название</th><th>Сортировка</th><th>Статус</th><th>Действия</th></tr></thead><tbody>`;
-                    if (cities.length === 0) {
-                        html += `<tr><td colspan="5" style="text-align:center;color:var(--text-light);padding:30px;">Городов нет</td></tr>`;
-                    } else {
-                        cities.forEach(c => {
-                            html += `<tr><td>#${c.id}</td><td><strong>${c.name}</strong></td><td>${c.sort_order || 0}</td><td>${c.is_active ? '✅ Активен' : '❌ Отключен'}</td><td><div class="admin-actions"><button class="btn btn-secondary btn-sm" onclick="editCity(${c.id})">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteCity(${c.id})">🗑️</button></div></td></tr>`;
-                        });
-                    }
-                    html += `</tbody></table></div>`;
-                    content.innerHTML = html;
-                } catch (error) {
-                    content.innerHTML = `<p style="color:#e74c3c;">❌ Ошибка загрузки городов: ${error.message}</p>`;
-                }
-            }
-
-            // ===== ТАРИФЫ =====
-            async function loadPlans() {
-                try {
-                    const plans = await apiFetch('/admin/plans');
-                    let html = `<h2 class="page-title">💰 Тарифы</h2><div style="margin-bottom:16px;"><button class="btn btn-primary btn-sm" onclick="showAddPlanForm()">➕ Добавить тариф</button></div><div id="planFormContainer"></div><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>ID</th><th>Название</th><th>BTC</th><th>ETH</th><th>USDT</th><th>Дней</th><th>Статус</th><th>Действия</th></tr></thead><tbody>`;
-                    if (plans.length === 0) {
-                        html += `<tr><td colspan="8" style="text-align:center;color:var(--text-light);padding:30px;">Тарифов нет</td></tr>`;
-                    } else {
-                        plans.forEach(p => {
-                            html += `<tr><td>#${p.id}</td><td><strong>${p.name}</strong></td><td>${p.price_btc || 0}</td><td>${p.price_eth || 0}</td><td>${p.price_usdt || 0}</td><td>${p.duration_days}</td><td>${p.is_active ? '✅ Активен' : '❌ Отключен'}</td><td><div class="admin-actions"><button class="btn btn-secondary btn-sm" onclick="editPlan(${p.id})">✏️</button><button class="btn btn-danger btn-sm" onclick="deletePlan(${p.id})">🗑️</button></div></td></tr>`;
-                        });
-                    }
-                    html += `</tbody></table></div>`;
-                    content.innerHTML = html;
-                } catch (error) {
-                    content.innerHTML = `<p style="color:#e74c3c;">❌ Ошибка загрузки тарифов: ${error.message}</p>`;
-                }
-            }
-
-            // ===== ЖАЛОБЫ =====
-            async function loadComplaints() {
-                try {
-                    const complaints = await apiFetch('/admin/complaints');
-                    let html = `<h2 class="page-title">⚠️ Жалобы</h2><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>ID</th><th>Анкета</th><th>Текст</th><th>Статус</th><th>Действия</th></tr></thead><tbody>`;
-                    if (complaints.length === 0) {
-                        html += `<tr><td colspan="5" style="text-align:center;color:var(--text-light);padding:30px;">Жалоб нет</td></tr>`;
-                    } else {
-                        complaints.forEach(c => {
-                            const status = getComplaintStatus(c.status);
-                            html += `<tr><td>#${c.id}</td><td>${c.profile_name || '#' + c.profile_id}</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.complaint_text || '—'}</td><td><span class="status-badge" style="background:${status.bg};color:${status.color};">${status.label}</span></td><td><div class="admin-actions"><button class="btn btn-success btn-sm" onclick="resolveComplaint(${c.id})">✅</button><button class="btn btn-secondary btn-sm" onclick="reviewComplaint(${c.id})">👁️</button></div></td></tr>`;
-                        });
-                    }
-                    html += `</tbody></table></div>`;
-                    content.innerHTML = html;
-                } catch (error) {
-                    content.innerHTML = `<p style="color:#e74c3c;">❌ Ошибка загрузки жалоб: ${error.message}</p>`;
-                }
-            }
-
-            // ===== АДМИНИСТРАТОРЫ =====
-            async function loadAdmins() {
-                try {
-                    const admins = await apiFetch('/admin/admins');
-                    let html = `<h2 class="page-title">👥 Администраторы</h2><div style="margin-bottom:16px;"><button class="btn btn-primary btn-sm" onclick="showAddAdminForm()">➕ Добавить администратора</button></div><div id="adminFormContainer"></div><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>ID</th><th>Логин</th><th>Роль</th><th>Статус</th><th>Последний вход</th><th>Действия</th></tr></thead><tbody>`;
-                    if (admins.length === 0) {
-                        html += `<tr><td colspan="6" style="text-align:center;color:var(--text-light);padding:30px;">Администраторов нет</td></tr>`;
-                    } else {
-                        admins.forEach(a => {
-                            html += `<tr><td>#${a.id}</td><td><strong>${a.username}</strong></td><td>${a.role === 'superadmin' ? '⭐ Супер' : '🛡️ Модератор'}</td><td>${a.is_active ? '✅ Активен' : '❌ Отключен'}</td><td>${a.last_login ? formatDate(a.last_login) : '—'}</td><td><div class="admin-actions"><button class="btn btn-secondary btn-sm" onclick="editAdmin(${a.id})">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteAdmin(${a.id})">🗑️</button></div></td></tr>`;
-                        });
-                    }
-                    html += `</tbody></table></div>`;
-                    content.innerHTML = html;
-                } catch (error) {
-                    content.innerHTML = `<p style="color:#e74c3c;">❌ Ошибка загрузки администраторов: ${error.message}</p>`;
-                }
-            }
-
-            // ===== НАСТРОЙКИ =====
-            async function loadSettings() {
-                try {
-                    const settings = await apiFetch('/admin/settings');
-                    const fields = [
-                        { key: 'site_title', label: 'Название сайта', type: 'text' },
-                        { key: 'site_description', label: 'Описание сайта', type: 'text' },
-                        { key: 'site_url', label: 'URL сайта', type: 'url' },
-                        { key: 'telegram_bot_token', label: 'Telegram Bot Token', type: 'text' },
-                        { key: 'telegram_channel_username', label: 'Telegram канал (username)', type: 'text' },
-                        { key: 'telegram_support_username', label: 'Telegram поддержка (username)', type: 'text' },
-                        { key: 'telegram_exchange_username', label: 'Telegram обменник (username)', type: 'text' },
-                        { key: 'btc_wallet', label: 'BTC кошелек', type: 'text' },
-                        { key: 'eth_wallet', label: 'ETH кошелек', type: 'text' },
-                        { key: 'usdt_trc20_wallet', label: 'USDT TRC20 кошелек', type: 'text' }
-                    ];
-                    let html = `<h2 class="page-title">⚙️ Настройки</h2><form id="settingsForm" style="max-width:600px;">`;
-                    fields.forEach(f => {
-                        const value = settings[f.key] || '';
-                        html += `<div class="admin-form-group"><label>${f.label}</label><input type="${f.type}" name="${f.key}" class="form-control" value="${value}" /></div>`;
-                    });
-                    html += `<button type="submit" class="btn btn-primary">💾 Сохранить настройки</button></form><div id="settingsMessage" style="margin-top:12px;"></div>`;
-                    content.innerHTML = html;
-                    document.getElementById('settingsForm').addEventListener('submit', async function(e) {
-                        e.preventDefault();
-                        const formData = new FormData(this);
-                        const data = {};
-                        formData.forEach((value, key) => { data[key] = value; });
-                        try {
-                            await apiFetch('/admin/settings', { method: 'PUT', body: JSON.stringify(data) });
-                            document.getElementById('settingsMessage').innerHTML = '<span style="color:#2ECC71;">✅ Настройки сохранены</span>';
-                        } catch (error) {
-                            document.getElementById('settingsMessage').innerHTML = `<span style="color:#e74c3c;">❌ ${error.message}</span>`;
-                        }
-                    });
-                } catch (error) {
-                    content.innerHTML = `<p style="color:#e74c3c;">❌ Ошибка загрузки настроек: ${error.message}</p>`;
-                }
-            }
-
-                       // ===== ГЛОБАЛЬНЫЕ ДЕЙСТВИЯ =====
-            window.approveProfile = async function(id) {
-                if (!confirm('Подтвердить анкету #' + id + '?')) return;
-                try {
-                    await apiFetch('/profiles/' + id, { method: 'PUT', body: JSON.stringify({ status: 'active' }) });
-                    loadTab(currentTab);
-                } catch (error) { alert('Ошибка: ' + error.message); }
-            };
-
-            window.rejectProfile = async function(id) {
-                const reason = prompt('Причина отклонения:');
-                if (reason === null) return;
-                try {
-                    await apiFetch('/profiles/' + id, { method: 'PUT', body: JSON.stringify({ status: 'rejected', rejection_reason: reason }) });
-                    loadTab(currentTab);
-                } catch (error) { alert('Ошибка: ' + error.message); }
-            };
-
-            window.viewProfile = function(id) {
-                window.open('/profiles.html?profile=' + id, '_blank');
-            };
-
-            window.confirmPayment = async function(id) {
-                if (!confirm('Подтвердить платеж #' + id + '?')) return;
-                try {
-                    await apiFetch('/payments/' + id, { method: 'PUT', body: JSON.stringify({ status: 'confirmed', payment_comment: 'Подтверждено админом' }) });
-                    loadTab(currentTab);
-                } catch (error) { alert('Ошибка: ' + error.message); }
-            };
-
-            window.rejectPayment = async function(id) {
-                const reason = prompt('Причина отклонения:');
-                if (reason === null) return;
-                try {
-                    await apiFetch('/payments/' + id, { method: 'PUT', body: JSON.stringify({ status: 'rejected', payment_comment: reason }) });
-                    loadTab(currentTab);
-                } catch (error) { alert('Ошибка: ' + error.message); }
-            };
-
-            window.showAddCityForm = function() {
-                document.getElementById('cityFormContainer').innerHTML = `
-                    <div class="admin-form-group" style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;padding:12px;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:12px;">
-                        <div style="flex:1;min-width:150px;"><label>Название города</label><input type="text" id="newCityName" class="form-control" placeholder="Москва" /></div>
-                        <div style="flex:0 0 100px;"><label>Сортировка</label><input type="number" id="newCitySort" class="form-control" value="0" /></div>
-                        <button class="btn btn-primary btn-sm" onclick="createCity()">➕ Добавить</button>
-                        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('cityFormContainer').innerHTML=''">✕</button>
-                    </div>
-                `;
-            };
-
-            window.createCity = async function() {
-                const name = document.getElementById('newCityName').value.trim();
-                const sort = parseInt(document.getElementById('newCitySort').value) || 0;
-                if (!name) { alert('Введите название города'); return; }
-                try {
-                    await apiFetch('/admin/cities', { method: 'POST', body: JSON.stringify({ name, sort_order: sort, is_active: 1 }) });
-                    document.getElementById('cityFormContainer').innerHTML = '';
-                    loadTab('cities');
-                } catch (error) { alert('Ошибка: ' + error.message); }
-            };
-
-            window.deleteCity = async function(id) {
-                if (!confirm('Удалить город #' + id + '?')) return;
-                try {
-                    await apiFetch('/admin/cities/' + id, { method: 'DELETE' });
-                    loadTab('cities');
-                } catch (error) { alert('Ошибка: ' + error.message); }
-            };
-
-            window.showAddPlanForm = function() {
-                document.getElementById('planFormContainer').innerHTML = `
-                    <div style="padding:16px;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;">
-                        <div><label>Название</label><input type="text" id="newPlanName" class="form-control" placeholder="VIP" /></div>
-                        <div><label>BTC</label><input type="number" id="newPlanBtc" class="form-control" step="0.00000001" value="0" /></div>
-                        <div><label>ETH</label><input type="number" id="newPlanEth" class="form-control" step="0.0001" value="0" /></div>
-                        <div><label>USDT</label><input type="number" id="newPlanUsdt" class="form-control" step="0.01" value="0" /></div>
-                        <div><label>Дней</label><input type="number" id="newPlanDays" class="form-control" value="30" /></div>
-                        <div><label>Сортировка</label><input type="number" id="newPlanSort" class="form-control" value="0" /></div>
-                        <div style="display:flex;align-items:flex-end;gap:8px;"><button class="btn btn-primary btn-sm" onclick="createPlan()">➕ Добавить</button><button class="btn btn-secondary btn-sm" onclick="document.getElementById('planFormContainer').innerHTML=''">✕</button></div>
-                    </div>
-                `;
-            };
-
-            window.createPlan = async function() {
-                const name = document.getElementById('newPlanName').value.trim();
-                if (!name) { alert('Введите название тарифа'); return; }
-                const data = {
-                    name,
-                    price_btc: parseFloat(document.getElementById('newPlanBtc').value) || 0,
-                    price_eth: parseFloat(document.getElementById('newPlanEth').value) || 0,
-                    price_usdt: parseFloat(document.getElementById('newPlanUsdt').value) || 0,
-                    duration_days: parseInt(document.getElementById('newPlanDays').value) || 30,
-                    sort_order: parseInt(document.getElementById('newPlanSort').value) || 0,
-                    is_active: 1
-                };
-                try {
-                    await apiFetch('/admin/plans', { method: 'POST', body: JSON.stringify(data) });
-                    document.getElementById('planFormContainer').innerHTML = '';
-                    loadTab('plans');
-                } catch (error) { alert('Ошибка: ' + error.message); }
-            };
-
-            window.deletePlan = async function(id) {
-                if (!confirm('Удалить тариф #' + id + '?')) return;
-                try {
-                    await apiFetch('/admin/plans/' + id, { method: 'DELETE' });
-                    loadTab('plans');
-                } catch (error) { alert('Ошибка: ' + error.message); }
-            };
-
-            window.reviewComplaint = async function(id) {
-                try {
-                    await apiFetch('/admin/complaints/' + id, { method: 'PUT', body: JSON.stringify({ status: 'reviewed', moderator_comment: 'Просмотрено' }) });
-                    loadTab('complaints');
-                } catch (error) { alert('Ошибка: ' + error.message); }
-            };
-
-            window.resolveComplaint = async function(id) {
-                const comment = prompt('Комментарий модератора:');
-                if (comment === null) return;
-                try {
-                    await apiFetch('/admin/complaints/' + id, { method: 'PUT', body: JSON.stringify({ status: 'resolved', moderator_comment: comment }) });
-                    loadTab('complaints');
-                } catch (error) { alert('Ошибка: ' + error.message); }
-            };
-
-            window.showAddAdminForm = function() {
-                document.getElementById('adminFormContainer').innerHTML = `
-                    <div style="padding:16px;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;">
-                        <div><label>Логин</label><input type="text" id="newAdminUsername" class="form-control" placeholder="admin" /></div>
-                        <div><label>Пароль</label><input type="password" id="newAdminPassword" class="form-control" placeholder="******" /></div>
-                        <div><label>Роль</label><select id="newAdminRole" class="form-control"><option value="moderator">Модератор</option><option value="superadmin">Супер-админ</option></select></div>
-                        <div style="display:flex;align-items:flex-end;gap:8px;"><button class="btn btn-primary btn-sm" onclick="createAdmin()">➕ Добавить</button><button class="btn btn-secondary btn-sm" onclick="document.getElementById('adminFormContainer').innerHTML=''">✕</button></div>
-                    </div>
-                `;
-            };
-
-            window.createAdmin = async function() {
-                const username = document.getElementById('newAdminUsername').value.trim();
-                const password = document.getElementById('newAdminPassword').value;
-                const role = document.getElementById('newAdminRole').value;
-                if (!username || !password) { alert('Заполните логин и пароль'); return; }
-                if (password.length < 6) { alert('Пароль должен быть минимум 6 символов'); return; }
-                try {
-                    await apiFetch('/admin/admins', { method: 'POST', body: JSON.stringify({ username, password, role, is_active: 1 }) });
-                    document.getElementById('adminFormContainer').innerHTML = '';
-                    loadTab('admins');
-                } catch (error) { alert('Ошибка: ' + error.message); }
-            };
-
-            window.deleteAdmin = async function(id) {
-                if (!confirm('Удалить администратора #' + id + '?')) return;
-                try {
-                    await apiFetch('/admin/admins/' + id, { method: 'DELETE' });
-                    loadTab('admins');
-                } catch (error) { alert('Ошибка: ' + error.message); }
-            };
-
-            // ===== СТАТУСЫ =====
-            function getProfileStatus(status) {
-                const map = {
-                    pending: { label: 'Ожидает', color: '#F1C40F', bg: '#FFF8E1' },
-                    active: { label: 'Активна', color: '#2ECC71', bg: '#E8F8F0' },
-                    rejected: { label: 'Отклонена', color: '#E74C3C', bg: '#FDEDEC' },
-                    blocked: { label: 'Заблокирована', color: '#E74C3C', bg: '#FDEDEC' },
-                    expired: { label: 'Истекла', color: '#95A5A6', bg: '#F4F6F7' }
-                };
-                return map[status] || { label: status, color: '#666', bg: '#F0F0F0' };
-            }
-
-            function getPaymentStatus(status) {
-                const map = {
-                    waiting: { label: 'Ожидает', color: '#F1C40F', bg: '#FFF8E1' },
-                    confirmed: { label: 'Подтвержден', color: '#2ECC71', bg: '#E8F8F0' },
-                    rejected: { label: 'Отклонен', color: '#E74C3C', bg: '#FDEDEC' }
-                };
-                return map[status] || { label: status, color: '#666', bg: '#F0F0F0' };
-            }
-
-            function getComplaintStatus(status) {
-                const map = {
-                    new: { label: 'Новая', color: '#E74C3C', bg: '#FDEDEC' },
-                    reviewed: { label: 'Просмотрена', color: '#F1C40F', bg: '#FFF8E1' },
-                    resolved: { label: 'Решена', color: '#2ECC71', bg: '#E8F8F0' }
-                };
-                return map[status] || { label: status, color: '#666', bg: '#F0F0F0' };
-            }
-
-            // ===== ИНИЦИАЛИЗАЦИЯ =====
-            document.addEventListener('DOMContentLoaded', function() {
-                initBurger();
-                loadTab('stats');
-            });
-
-        })();
-    </script>
+    <script src="/frontend/app.js"></script>
 </body>
 </html>
