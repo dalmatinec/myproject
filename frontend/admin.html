@@ -53,6 +53,25 @@
                         </button>
                     </li>
                     <li>
+                        <button class="admin-nav-btn" data-tab="cities" data-translate="adm_tab_cities">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="2" y="4" width="16" height="14" rx="1"/>
+                                <rect x="5" y="7" width="4" height="4" rx="1"/>
+                                <rect x="11" y="7" width="4" height="4" rx="1"/>
+                            </svg>
+                            Города
+                        </button>
+                    </li>
+                    <li>
+                        <button class="admin-nav-btn" data-tab="tariffs" data-translate="adm_tab_tariffs">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="10" cy="10" r="8"/>
+                                <path d="M10 4V10L13 13"/>
+                            </svg>
+                            Тарифы
+                        </button>
+                    </li>
+                    <li>
                         <button class="admin-nav-btn" data-tab="wallets" data-translate="adm_tab_wallets">
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
                                 <rect x="2" y="6" width="16" height="10" rx="1"/>
@@ -80,7 +99,6 @@
         <main class="admin-main" role="main">
             <!-- СЕКЦИЯ МОДЕРАЦИИ И СТАТИСТИКИ -->
             <section id="tab-moderation" class="admin-tab active">
-                <!-- БЛОК СТАТИСТИКИ -->
                 <div class="admin-stats-grid">
                     <div class="stat-card">
                         <span class="stat-card-label" data-translate="stat_total_profiles">Всего анкет</span>
@@ -95,14 +113,45 @@
                         <span class="stat-card-number" id="stat-news-count">0</span>
                     </div>
                 </div>
-
-                <!-- БЛОК МОДЕРАЦИИ -->
                 <div class="admin-tab-header">
                     <h2 class="admin-tab-title" data-translate="adm_mod_title">Анкеты на модерацию</h2>
                 </div>
                 <div class="admin-profiles-grid" id="admin-moderation-list">
                     <div id="admin-mod-empty" class="admin-empty" data-translate="adm_mod_empty">Нет анкет на модерацию</div>
                 </div>
+            </section>
+
+            <!-- СЕКЦИЯ ГОРОДОВ -->
+            <section id="tab-cities" class="admin-tab" style="display: none;">
+                <div class="admin-tab-header">
+                    <h2 class="admin-tab-title" data-translate="adm_cities_title">Управление городами</h2>
+                </div>
+                <form id="admin-city-form" class="admin-form-inline" novalidate>
+                    <div class="admin-form-group" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                        <input type="text" id="city-name" name="city_name" class="admin-form-input" style="flex: 1; min-width: 200px;" placeholder="Название города" data-translate-placeholder="adm_city_placeholder">
+                        <button type="submit" class="btn btn-primary" data-translate="adm_city_add">Добавить город</button>
+                    </div>
+                </form>
+                <ul id="cities-list" class="admin-simple-list">
+                    <li class="admin-empty" id="cities-empty" data-translate="adm_cities_empty">Города не добавлены</li>
+                </ul>
+            </section>
+
+            <!-- СЕКЦИЯ ТАРИФОВ -->
+            <section id="tab-tariffs" class="admin-tab" style="display: none;">
+                <div class="admin-tab-header">
+                    <h2 class="admin-tab-title" data-translate="adm_tariffs_title">Управление тарифами</h2>
+                </div>
+                <form id="admin-tariff-form" class="admin-form-inline" novalidate>
+                    <div class="admin-form-group" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                        <input type="text" id="tariff-name" name="tariff_name" class="admin-form-input" style="flex: 1; min-width: 150px;" placeholder="Название тарифа" data-translate-placeholder="adm_tariff_name_placeholder">
+                        <input type="number" id="tariff-price" name="tariff_price" class="admin-form-input" style="width: 120px;" placeholder="Цена" data-translate-placeholder="adm_tariff_price_placeholder">
+                        <button type="submit" class="btn btn-primary" data-translate="adm_tariff_add">Добавить тариф</button>
+                    </div>
+                </form>
+                <ul id="tariffs-list" class="admin-simple-list">
+                    <li class="admin-empty" id="tariffs-empty" data-translate="adm_tariffs_empty">Тарифы не добавлены</li>
+                </ul>
             </section>
 
             <!-- СЕКЦИЯ КОШЕЛЬКОВ -->
@@ -115,17 +164,14 @@
                         <label for="wallet-btc" class="admin-form-label" data-translate="adm_wallet_btc">Bitcoin</label>
                         <input type="text" id="wallet-btc" name="wallet_btc" class="admin-form-input" data-translate-placeholder="adm_wallet_btc_placeholder">
                     </div>
-
                     <div class="admin-form-group">
                         <label for="wallet-eth" class="admin-form-label" data-translate="adm_wallet_eth">Ethereum</label>
                         <input type="text" id="wallet-eth" name="wallet_eth" class="admin-form-input" data-translate-placeholder="adm_wallet_eth_placeholder">
                     </div>
-
                     <div class="admin-form-group">
                         <label for="wallet-usdt" class="admin-form-label" data-translate="adm_wallet_usdt">USDT (TRC-20)</label>
                         <input type="text" id="wallet-usdt" name="wallet_usdt" class="admin-form-input" data-translate-placeholder="adm_wallet_usdt_placeholder">
                     </div>
-
                     <button type="submit" class="btn btn-primary admin-form-submit" data-translate="adm_save_wallets">Сохранить кошельки</button>
                 </form>
             </section>
@@ -140,17 +186,14 @@
                         <label for="news-title" class="admin-form-label" data-translate="adm_news_title_label">Заголовок</label>
                         <input type="text" id="news-title" name="news_title" class="admin-form-input" required data-translate-placeholder="adm_news_title_placeholder">
                     </div>
-
                     <div class="admin-form-group">
                         <label for="news-content" class="admin-form-label" data-translate="adm_news_content_label">Текст новости</label>
                         <textarea id="news-content" name="news_content" class="admin-form-textarea" rows="6" required data-translate-placeholder="adm_news_content_placeholder"></textarea>
                     </div>
-
                     <div class="admin-form-group">
                         <label for="news-image" class="admin-form-label" data-translate="adm_news_image_label">Ссылка на картинку</label>
                         <input type="text" id="news-image" name="news_image" class="admin-form-input" data-translate-placeholder="adm_news_image_placeholder">
                     </div>
-
                     <button type="submit" class="btn btn-primary admin-form-submit" data-translate="adm_publish_news">Опубликовать новость</button>
                 </form>
             </section>
