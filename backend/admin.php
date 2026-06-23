@@ -8,15 +8,21 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'GET':
-        requireAdmin();
-        if ($action === 'dashboard') {
-            getDashboard();
-        } elseif ($action === 'cities') {
-            getCities();
-        } elseif ($action === 'tariffs') {
-            getTariffs();
+        // Публичные методы (не требуют авторизации)
+        if ($action === 'cities' || $action === 'tariffs') {
+            if ($action === 'cities') {
+                getCities();
+            } elseif ($action === 'tariffs') {
+                getTariffs();
+            }
         } else {
-            jsonResponse(['error' => 'Invalid action'], 400);
+            // Все остальные GET-запросы требуют авторизации
+            requireAdmin();
+            if ($action === 'dashboard') {
+                getDashboard();
+            } else {
+                jsonResponse(['error' => 'Invalid action'], 400);
+            }
         }
         break;
 
