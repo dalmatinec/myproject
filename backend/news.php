@@ -1,280 +1,415 @@
 <?php
-// =============================================
-// WeToo - News API (Production — Webhook Only)
-// =============================================
-
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
-
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    exit(0);
-}
+// news.php - Обработчик новостей
 
 require_once 'config.php';
 
+// Получение действия
+$action = isset($_GET['action']) ? $_GET['action'] : '';
 $method = $_SERVER['REQUEST_METHOD'];
 
-// =============================================
-// Роутинг через REQUEST_URI
-// =============================================
-$uri = $_SERVER['REQUEST_URI'] ?? '/';
-$path = parse_url($uri, PHP_URL_PATH);
-$path = str_replace('/api/news', '', $path);
-if (empty($path)) {
-    $path = '/';
-}
-
-switch ($path) {
-    case '/':
-        if ($method === 'GET') {
-            handleGetList($pdo);
+switch ($method) {
+    case 'GET':
+        if ($action === 'get' && isset($_GET['id'])) {
+            getNews($_GET['id']);
         } else {
-            http_response_code(405);
-            echo json_encode(['error' => 'Method not allowed']);
+            getNewsList();
         }
         break;
     
-    case '/webhook':
-        // Только POST для Telegram Webhook
-        if ($method === 'POST') {
-            handleWebhook($pdo);
-        } else {
-            http_response_code(405);
-            echo json_encode(['error' => 'Method not allowed']);
+    case 'POST':
+        requireAdmin();
+        createNews();
+        break;
+    
+    case 'PUT':
+        requireAdmin();
+        if (!isset($_GET['id'])) {
+            jsonResponse(['error' => 'News ID required'], 400);
         }
+        updateNews($_GET['id']);
+        break;
+    
+    case 'DELETE':
+        requireAdmin();
+        if (!isset($_GET['id'])) {
+            jsonResponse(['error' => 'News ID required'], 400);
+        }
+        deleteNews($_GET['id']);
         break;
     
     default:
-        if (preg_match('/^\/(\d+)$/', $path, $matches)) {
-            $id = (int)$matches[1];
-            if ($method === 'GET') {
-                handleGetOne($pdo, $id);
-            } elseif ($method === 'DELETE') {
-                handleDelete($pdo, $id);
-            } else {
-                http_response_code(405);
-                echo json_encode(['error' => 'Method not allowed']);
-            }
-        } else {
-            http_response_code(404);
-            echo json_encode(['error' => 'Not found']);
-        }
-        break;
+        jsonResponse(['error' => 'Method not allowed'], 405);
 }
 
-// =============================================
-// ПОЛУЧЕНИЕ НОВОСТЕЙ (ПУБЛИЧНЫЙ API)
-// =============================================
-
-function handleGetList($pdo) {
-    $params = $_GET;
-    $page = max(1, (int)($params['page'] ?? 1));
-    $limit = min(50, max(1, (int)($params['limit'] ?? 10)));
-    $offset = ($page - 1) * $limit;
-    
+// Получение списка новостей (публичный)
+function getNewsList() {
     try {
-        $countStmt = $pdo->query("SELECT COUNT(*) as total FROM news");
-        $total = $countStmt->fetch()['total'];
+        $pdo = getDB();
         
-        $stmt = $pdo->prepare("
-            SELECT id, slug, title, content, image_url, telegram_url, published_at, created_at
-            FROM news
-            ORDER BY published_at DESC
-            LIMIT ? OFFSET ?
-        ");
-        $stmt->execute([$limit, $offset]);
+        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
+        $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
+        $status = isset($_GET['status']) ? sanitize($_GET['status']) : 'active';
+        
+        // Базовый запрос
+        $sql = "SELECT id, title, content, image, views, created_at 
+                FROM news 
+                WHERE 1=1";
+        
+        $params = [];
+        
+        // Фильтр по статусу (для админов показываем все)
+        if ($status) {
+            $sql .= " AND status = ?";
+            $params[] = $status;
+        }
+        
+        // Сортировка
+        $sql .= " ORDER BY created_at DESC";
+        
+        // Пагинация
+        $sql .= " LIMIT ? OFFSET ?";
+        
+        $stmt = $pdo->prepare($sql);
+        
+        // Привязка параметров фильтров
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key + 1, $value);
+        }
+        
+        // Привязка LIMIT и OFFSET
+        $offsetIndex = count($params) + 1;
+        $limitIndex = count($params) + 2;
+        
+        $stmt->bindValue($offsetIndex, $offset, PDO::PARAM_INT);
+        $stmt->bindValue($limitIndex, $limit, PDO::PARAM_INT);
+        
+        $stmt->execute();
         $news = $stmt->fetchAll();
         
-        echo json_encode([
+        // Получение общего количества
+        $countSql = "SELECT COUNT(*) as total FROM news WHERE 1=1";
+        $countParams = [];
+        
+        if ($status) {
+            $countSql .= " AND status = ?";
+            $countParams[] = $status;
+        }
+        
+        $countStmt = $pdo->prepare($countSql);
+        $countStmt->execute($countParams);
+        $total = $countStmt->fetch()['total'];
+        
+        jsonResponse([
+            'success' => true,
             'data' => $news,
             'pagination' => [
-                'page' => $page,
-                'limit' => $limit,
                 'total' => (int)$total,
-                'pages' => ceil($total / $limit)
+                'limit' => $limit,
+                'offset' => $offset
             ]
         ]);
-    } catch (Exception $e) {
-        http_response_code(500);
-        echo json_encode(['error' => 'Database error']);
+        
+    } catch (PDOException $e) {
+        if (DEBUG_MODE) {
+            jsonResponse(['error' => 'Database error: ' . $e->getMessage()], 500);
+        } else {
+            jsonResponse(['error' => 'Failed to fetch news'], 500);
+        }
     }
 }
 
-function handleGetOne($pdo, $id) {
+// Получение одной новости (публичный)
+function getNews($id) {
     try {
-        $stmt = $pdo->prepare("
-            SELECT id, slug, title, content, image_url, telegram_url, published_at, created_at
-            FROM news
-            WHERE id = ?
-        ");
+        $pdo = getDB();
+        
+        $stmt = $pdo->prepare("SELECT id, title, content, image, views, created_at, status FROM news WHERE id = ?");
         $stmt->execute([$id]);
         $news = $stmt->fetch();
         
         if (!$news) {
-            http_response_code(404);
-            echo json_encode(['error' => 'News not found']);
-            return;
+            jsonResponse(['error' => 'News not found'], 404);
         }
         
-        echo json_encode($news);
-    } catch (Exception $e) {
-        http_response_code(500);
-        echo json_encode(['error' => 'Database error']);
+        // Проверка накрутки просмотров через сессию
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        if (!isset($_SESSION['viewed_news'])) {
+            $_SESSION['viewed_news'] = [];
+        }
+        
+        // Если новость еще не просматривалась в этой сессии
+        if (!in_array($id, $_SESSION['viewed_news'])) {
+            // Увеличение счетчика просмотров
+            $stmt = $pdo->prepare("UPDATE news SET views = views + 1 WHERE id = ?");
+            $stmt->execute([$id]);
+            
+            // Запись ID в сессию
+            $_SESSION['viewed_news'][] = $id;
+            
+            // Запись статистики
+            logStat('news_view', $id);
+        }
+        
+        jsonResponse([
+            'success' => true,
+            'data' => $news
+        ]);
+        
+    } catch (PDOException $e) {
+        if (DEBUG_MODE) {
+            jsonResponse(['error' => 'Database error: ' . $e->getMessage()], 500);
+        } else {
+            jsonResponse(['error' => 'Failed to fetch news'], 500);
+        }
     }
 }
 
-// =============================================
-// WEBHOOK — ЕДИНСТВЕННЫЙ СПОСОБ ПОЛУЧЕНИЯ НОВОСТЕЙ
-// =============================================
-
-function handleWebhook($pdo) {
-    // 1. Проверяем, что запрос от Telegram
-    $input = file_get_contents('php://input');
-    if (empty($input)) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Empty request']);
-        return;
-    }
-    
-    $data = json_decode($input, true);
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Invalid JSON']);
-        return;
-    }
-    
-    // 2. Проверяем наличие channel_post
-    if (!isset($data['channel_post'])) {
-        http_response_code(200);
-        echo json_encode(['status' => 'ignored']);
-        return;
-    }
-    
-    // 3. Получаем настройки
-    $settings = getSettings($pdo);
-    $botToken = $settings['telegram_bot_token'] ?? '';
-    $channelUsername = $settings['telegram_channel_username'] ?? '';
-    
-    if (empty($botToken)) {
-        http_response_code(500);
-        echo json_encode(['error' => 'Bot token not configured']);
-        return;
-    }
-    
-    $post = $data['channel_post'];
-    $telegramPostId = $post['message_id'];
-    $chatId = $post['chat']['id'] ?? 0;
-    $chatUsername = $post['chat']['username'] ?? '';
-    
-    // 4. Проверяем, что пост из нашего канала
-    if (!empty($channelUsername) && $chatUsername !== ltrim($channelUsername, '@')) {
-        http_response_code(200);
-        echo json_encode(['status' => 'ignored_wrong_channel']);
-        return;
-    }
-    
-    // 5. Защита от дублей (Telegram может дублировать webhook-запросы)
+// Создание новости (только админ)
+function createNews() {
     try {
-        $stmt = $pdo->prepare("SELECT id FROM news WHERE telegram_post_id = ?");
-        $stmt->execute([$telegramPostId]);
-        if ($stmt->fetch()) {
-            http_response_code(200);
-            echo json_encode(['status' => 'duplicate']);
-            return;
+        $pdo = getDB();
+        
+        // Получение данных
+        $title = isset($_POST['title']) ? sanitize($_POST['title']) : null;
+        $content = isset($_POST['content']) ? sanitize($_POST['content']) : null;
+        $status = isset($_POST['status']) ? sanitize($_POST['status']) : 'active';
+        
+        // Валидация обязательных полей
+        if (!$title || !$content) {
+            jsonResponse(['error' => 'Title and content are required'], 400);
         }
-    } catch (Exception $e) {
-        http_response_code(500);
-        echo json_encode(['error' => 'Database error']);
-        return;
-    }
-    
-    // 6. Сохраняем новость
-    try {
-        $text = $post['text'] ?? $post['caption'] ?? '';
         
-        // Первая строка — заголовок, остальное — текст
-        $lines = explode("\n", $text);
-        $title = $lines[0] ?? 'Новость';
-        $content = $text;
+        // Проверка статуса
+        $allowedStatuses = ['active', 'draft'];
+        if (!in_array($status, $allowedStatuses)) {
+            jsonResponse(['error' => 'Invalid status. Allowed: active, draft'], 400);
+        }
         
-        $telegramUrl = "https://t.me/{$chatUsername}/{$telegramPostId}";
-        
-        // 7. Обработка изображения
-        $imageUrl = null;
-        if (isset($post['photo']) && !empty($post['photo'])) {
-            $photo = end($post['photo']);
-            $fileId = $photo['file_id'];
+        // Обработка изображения
+        $image = null;
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $fileName = $_FILES['image']['name'];
+            $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
             
-            $fileUrl = "https://api.telegram.org/bot{$botToken}/getFile?file_id={$fileId}";
-            $fileResponse = @file_get_contents($fileUrl);
-            if ($fileResponse) {
-                $fileData = json_decode($fileResponse, true);
-                if ($fileData && isset($fileData['ok']) && $fileData['ok'] && isset($fileData['result']['file_path'])) {
-                    $imageUrl = "https://api.telegram.org/file/bot{$botToken}/" . $fileData['result']['file_path'];
-                }
+            // Проверка расширения
+            if (!in_array($ext, ALLOWED_EXTENSIONS)) {
+                jsonResponse(['error' => 'Invalid file type. Allowed: jpg, jpeg, png, gif, webp'], 400);
+            }
+            
+            // Проверка размера
+            if ($_FILES['image']['size'] > MAX_FILE_SIZE) {
+                jsonResponse(['error' => 'File too large. Max size: 5MB'], 400);
+            }
+            
+            // Сохранение файла
+            $image = bin2hex(random_bytes(16)) . '.' . $ext;
+            $uploadPath = UPLOAD_DIR . $image;
+            
+            if (!move_uploaded_file($_FILES['image']['tmp_name'], $uploadPath)) {
+                jsonResponse(['error' => 'Failed to upload image'], 500);
             }
         }
         
-        // 8. Генерация slug
-        $slug = generateSlug($title);
-        $stmt = $pdo->prepare("SELECT id FROM news WHERE slug = ?");
-        $stmt->execute([$slug]);
-        if ($stmt->fetch()) {
-            $slug = $slug . '-' . $telegramPostId;
-        }
-        
-        // 9. Сохраняем в БД
-        $publishedAt = date('Y-m-d H:i:s', $post['date'] ?? time());
+        // Создание новости
         $stmt = $pdo->prepare("
-            INSERT INTO news (telegram_post_id, slug, title, content, image_url, telegram_url, published_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO news (title, content, image, status)
+            VALUES (?, ?, ?, ?)
         ");
-        $stmt->execute([
-            $telegramPostId,
-            $slug,
-            $title,
-            $content,
-            $imageUrl,
-            $telegramUrl,
-            $publishedAt
+        $stmt->execute([$title, $content, $image, $status]);
+        $newsId = $pdo->lastInsertId();
+        
+        jsonResponse([
+            'success' => true,
+            'message' => 'News created successfully',
+            'news_id' => $newsId
         ]);
         
-        // 10. Возвращаем успех Telegram
-        http_response_code(200);
-        echo json_encode([
-            'status' => 'success',
-            'id' => $pdo->lastInsertId()
-        ]);
-        
-    } catch (Exception $e) {
-        http_response_code(500);
-        echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
+    } catch (PDOException $e) {
+        if (DEBUG_MODE) {
+            jsonResponse(['error' => 'Database error: ' . $e->getMessage()], 500);
+        } else {
+            jsonResponse(['error' => 'Failed to create news'], 500);
+        }
     }
 }
 
-// =============================================
-// УДАЛЕНИЕ НОВОСТИ (АДМИН)
-// =============================================
-
-function handleDelete($pdo, $id) {
-    $payload = requireAdmin($pdo);
-    if (!$payload) return;
-    
+// Обновление новости (только админ)
+function updateNews($id) {
     try {
+        $pdo = getDB();
+        
+        // Проверка существования новости
+        $stmt = $pdo->prepare("SELECT id, image FROM news WHERE id = ?");
+        $stmt->execute([$id]);
+        $news = $stmt->fetch();
+        
+        if (!$news) {
+            jsonResponse(['error' => 'News not found'], 404);
+        }
+        
+        // Получение данных (JSON или FormData)
+        $isFormData = isset($_FILES['image']) || isset($_POST['title']);
+        
+        if ($isFormData) {
+            // Обработка FormData
+            $title = isset($_POST['title']) ? sanitize($_POST['title']) : null;
+            $content = isset($_POST['content']) ? sanitize($_POST['content']) : null;
+            $status = isset($_POST['status']) ? sanitize($_POST['status']) : null;
+            
+            $fields = [];
+            $params = [];
+            
+            if ($title) {
+                $fields[] = "title = ?";
+                $params[] = $title;
+            }
+            
+            if ($content) {
+                $fields[] = "content = ?";
+                $params[] = $content;
+            }
+            
+            if ($status) {
+                $allowedStatuses = ['active', 'draft'];
+                if (!in_array($status, $allowedStatuses)) {
+                    jsonResponse(['error' => 'Invalid status. Allowed: active, draft'], 400);
+                }
+                $fields[] = "status = ?";
+                $params[] = $status;
+            }
+            
+            // Обработка изображения
+            if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+                $fileName = $_FILES['image']['name'];
+                $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+                
+                // Проверка расширения
+                if (!in_array($ext, ALLOWED_EXTENSIONS)) {
+                    jsonResponse(['error' => 'Invalid file type. Allowed: jpg, jpeg, png, gif, webp'], 400);
+                }
+                
+                // Проверка размера
+                if ($_FILES['image']['size'] > MAX_FILE_SIZE) {
+                    jsonResponse(['error' => 'File too large. Max size: 5MB'], 400);
+                }
+                
+                // Удаление старого изображения
+                if ($news['image']) {
+                    $oldPath = UPLOAD_DIR . $news['image'];
+                    if (file_exists($oldPath)) {
+                        @unlink($oldPath);
+                    }
+                }
+                
+                // Сохранение нового изображения
+                $image = bin2hex(random_bytes(16)) . '.' . $ext;
+                $uploadPath = UPLOAD_DIR . $image;
+                
+                if (!move_uploaded_file($_FILES['image']['tmp_name'], $uploadPath)) {
+                    jsonResponse(['error' => 'Failed to upload image'], 500);
+                }
+                
+                $fields[] = "image = ?";
+                $params[] = $image;
+            }
+            
+            if (empty($fields)) {
+                jsonResponse(['error' => 'No fields to update'], 400);
+            }
+            
+            $params[] = $id;
+            $sql = "UPDATE news SET " . implode(', ', $fields) . " WHERE id = ?";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
+            
+        } else {
+            // Обработка JSON
+            $input = json_decode(file_get_contents('php://input'), true);
+            
+            if (!$input) {
+                jsonResponse(['error' => 'Invalid input data'], 400);
+            }
+            
+            $fields = [];
+            $params = [];
+            
+            $allowedFields = ['title', 'content', 'status'];
+            foreach ($allowedFields as $field) {
+                if (isset($input[$field])) {
+                    if ($field === 'status') {
+                        $allowedStatuses = ['active', 'draft'];
+                        if (!in_array($input[$field], $allowedStatuses)) {
+                            jsonResponse(['error' => 'Invalid status. Allowed: active, draft'], 400);
+                        }
+                    }
+                    $fields[] = "$field = ?";
+                    $params[] = sanitize($input[$field]);
+                }
+            }
+            
+            if (empty($fields)) {
+                jsonResponse(['error' => 'No fields to update'], 400);
+            }
+            
+            $params[] = $id;
+            $sql = "UPDATE news SET " . implode(', ', $fields) . " WHERE id = ?";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
+        }
+        
+        jsonResponse([
+            'success' => true,
+            'message' => 'News updated successfully'
+        ]);
+        
+    } catch (PDOException $e) {
+        if (DEBUG_MODE) {
+            jsonResponse(['error' => 'Database error: ' . $e->getMessage()], 500);
+        } else {
+            jsonResponse(['error' => 'Failed to update news'], 500);
+        }
+    }
+}
+
+// Удаление новости (только админ)
+function deleteNews($id) {
+    try {
+        $pdo = getDB();
+        
+        // Проверка существования новости
+        $stmt = $pdo->prepare("SELECT id, image FROM news WHERE id = ?");
+        $stmt->execute([$id]);
+        $news = $stmt->fetch();
+        
+        if (!$news) {
+            jsonResponse(['error' => 'News not found'], 404);
+        }
+        
+        // Удаление изображения
+        if ($news['image']) {
+            $filePath = UPLOAD_DIR . $news['image'];
+            if (file_exists($filePath)) {
+                @unlink($filePath);
+            }
+        }
+        
+        // Удаление новости
         $stmt = $pdo->prepare("DELETE FROM news WHERE id = ?");
         $stmt->execute([$id]);
         
-        if ($stmt->rowCount() === 0) {
-            http_response_code(404);
-            echo json_encode(['error' => 'News not found']);
-            return;
-        }
+        jsonResponse([
+            'success' => true,
+            'message' => 'News deleted successfully'
+        ]);
         
-        echo json_encode(['success' => true]);
-    } catch (Exception $e) {
-        http_response_code(500);
-        echo json_encode(['error' => 'Database error']);
+    } catch (PDOException $e) {
+        if (DEBUG_MODE) {
+            jsonResponse(['error' => 'Database error: ' . $e->getMessage()], 500);
+        } else {
+            jsonResponse(['error' => 'Failed to delete news'], 500);
+        }
     }
 }
