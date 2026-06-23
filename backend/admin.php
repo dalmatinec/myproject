@@ -3,117 +3,174 @@
 
 require_once 'config.php';
 
-// Получение действия
 $action = isset($_GET['action']) ? $_GET['action'] : '';
 $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'GET':
+        requireAdmin();
         if ($action === 'dashboard') {
-            requireAdmin();
             getDashboard();
+        } elseif ($action === 'cities') {
+            getCities();
+        } elseif ($action === 'tariffs') {
+            getTariffs();
         } else {
             jsonResponse(['error' => 'Invalid action'], 400);
         }
         break;
-    
+
+    case 'POST':
+        requireAdmin();
+        if ($action === 'cities') {
+            addCity();
+        } elseif ($action === 'tariffs') {
+            addTariff();
+        } else {
+            jsonResponse(['error' => 'Invalid action'], 400);
+        }
+        break;
+
+    case 'DELETE':
+        requireAdmin();
+        if ($action === 'city' && isset($_GET['id'])) {
+            deleteCity($_GET['id']);
+        } elseif ($action === 'tariff' && isset($_GET['id'])) {
+            deleteTariff($_GET['id']);
+        } else {
+            jsonResponse(['error' => 'Invalid action or missing ID'], 400);
+        }
+        break;
+
     default:
         jsonResponse(['error' => 'Method not allowed'], 405);
 }
 
-// Получение данных для дашборда
+// ===== ДАШБОРД =====
 function getDashboard() {
     try {
         $pdo = getDB();
-        
-        // ===== БЛОК СЧЕТЧИКОВ =====
-        
-        // Всего активных анкет
         $stmt = $pdo->query("SELECT COUNT(*) as count FROM profiles WHERE status = 'active'");
         $activeProfiles = $stmt->fetch()['count'];
-        
-        // Анкет на модерации
         $stmt = $pdo->query("SELECT COUNT(*) as count FROM profiles WHERE status = 'pending'");
         $pendingProfiles = $stmt->fetch()['count'];
-        
-        // Общее количество просмотров всех анкет
         $stmt = $pdo->query("SELECT SUM(views) as total FROM profiles");
         $totalViews = $stmt->fetch()['total'] ?? 0;
-        
-        // Всего новостей
         $stmt = $pdo->query("SELECT COUNT(*) as count FROM news");
         $totalNews = $stmt->fetch()['count'];
-        
-        $totals = [
-            'active_profiles' => (int)$activeProfiles,
-            'pending_profiles' => (int)$pendingProfiles,
-            'total_views' => (int)$totalViews,
-            'total_news' => (int)$totalNews
-        ];
-        
-        // ===== БЛОК ФИНАНСОВ =====
-        
-        // Сумма подтвержденных платежей по валютам
-        $stmt = $pdo->query("
-            SELECT currency, SUM(amount) as total 
-            FROM payments 
-            WHERE status = 'confirmed' 
-            GROUP BY currency
-        ");
+
+        $stmt = $pdo->query("SELECT currency, SUM(amount) as total FROM payments WHERE status = 'confirmed' GROUP BY currency");
         $financeByCurrency = [];
         while ($row = $stmt->fetch()) {
             $financeByCurrency[$row['currency']] = (float)$row['total'];
         }
-        
-        // Количество платежей, ожидающих проверки
         $stmt = $pdo->query("SELECT COUNT(*) as count FROM payments WHERE status = 'pending'");
         $pendingPayments = $stmt->fetch()['count'];
-        
-        $finance = [
-            'confirmed_by_currency' => $financeByCurrency,
-            'pending_payments' => (int)$pendingPayments
-        ];
-        
-        // ===== БЛОК ПОСЛЕДНИХ СОБЫТИЙ =====
-        
-        // Последние 5 анкет
-        $stmt = $pdo->query("
-            SELECT id, name, status, created_at 
-            FROM profiles 
-            ORDER BY created_at DESC 
-            LIMIT 5
-        ");
+
+        $stmt = $pdo->query("SELECT id, name, status, created_at FROM profiles ORDER BY created_at DESC LIMIT 5");
         $recentProfiles = $stmt->fetchAll();
-        
-        // Последние 5 платежей
-        $stmt = $pdo->query("
-            SELECT id, profile_id, currency, amount, status, created_at 
-            FROM payments 
-            ORDER BY created_at DESC 
-            LIMIT 5
-        ");
+        $stmt = $pdo->query("SELECT id, profile_id, currency, amount, status, created_at FROM payments ORDER BY created_at DESC LIMIT 5");
         $recentPayments = $stmt->fetchAll();
-        
-        $recentActivity = [
-            'recent_profiles' => $recentProfiles,
-            'recent_payments' => $recentPayments
-        ];
-        
-        // ===== ФОРМИРОВАНИЕ ОТВЕТА =====
+
         jsonResponse([
             'success' => true,
             'data' => [
-                'totals' => $totals,
-                'finance' => $finance,
-                'recent_activity' => $recentActivity
+                'totals' => [
+                    'active_profiles' => (int)$activeProfiles,
+                    'pending_profiles' => (int)$pendingProfiles,
+                    'total_views' => (int)$totalViews,
+                    'total_news' => (int)$totalNews
+                ],
+                'finance' => [
+                    'confirmed_by_currency' => $financeByCurrency,
+                    'pending_payments' => (int)$pendingPayments
+                ],
+                'recent_activity' => [
+                    'recent_profiles' => $recentProfiles,
+                    'recent_payments' => $recentPayments
+                ]
             ]
         ]);
-        
     } catch (PDOException $e) {
-        if (DEBUG_MODE) {
-            jsonResponse(['error' => 'Database error: ' . $e->getMessage()], 500);
-        } else {
-            jsonResponse(['error' => 'Failed to fetch dashboard data'], 500);
-        }
+        jsonResponse(['error' => 'Database error: ' . $e->getMessage()], 500);
+    }
+}
+
+// ===== ГОРОДА =====
+function getCities() {
+    try {
+        $pdo = getDB();
+        $stmt = $pdo->query("SELECT id, name FROM cities ORDER BY name ASC");
+        $cities = $stmt->fetchAll();
+        jsonResponse(['success' => true, 'data' => $cities]);
+    } catch (PDOException $e) {
+        jsonResponse(['error' => 'Failed to load cities'], 500);
+    }
+}
+
+function addCity() {
+    $input = json_decode(file_get_contents('php://input'), true);
+    if (!isset($input['name']) || empty(trim($input['name']))) {
+        jsonResponse(['error' => 'City name is required'], 400);
+    }
+    try {
+        $pdo = getDB();
+        $stmt = $pdo->prepare("INSERT INTO cities (name) VALUES (?)");
+        $stmt->execute([trim($input['name'])]);
+        jsonResponse(['success' => true, 'message' => 'City added']);
+    } catch (PDOException $e) {
+        jsonResponse(['error' => 'Failed to add city'], 500);
+    }
+}
+
+function deleteCity($id) {
+    try {
+        $pdo = getDB();
+        $stmt = $pdo->prepare("DELETE FROM cities WHERE id = ?");
+        $stmt->execute([$id]);
+        jsonResponse(['success' => true, 'message' => 'City deleted']);
+    } catch (PDOException $e) {
+        jsonResponse(['error' => 'Failed to delete city'], 500);
+    }
+}
+
+// ===== ТАРИФЫ =====
+function getTariffs() {
+    try {
+        $pdo = getDB();
+        $stmt = $pdo->query("SELECT id, name, price FROM tariffs ORDER BY price ASC");
+        $tariffs = $stmt->fetchAll();
+        jsonResponse(['success' => true, 'data' => $tariffs]);
+    } catch (PDOException $e) {
+        jsonResponse(['error' => 'Failed to load tariffs'], 500);
+    }
+}
+
+function addTariff() {
+    $input = json_decode(file_get_contents('php://input'), true);
+    if (!isset($input['name']) || empty(trim($input['name']))) {
+        jsonResponse(['error' => 'Tariff name is required'], 400);
+    }
+    if (!isset($input['price']) || !is_numeric($input['price']) || $input['price'] < 0) {
+        jsonResponse(['error' => 'Valid price is required'], 400);
+    }
+    try {
+        $pdo = getDB();
+        $stmt = $pdo->prepare("INSERT INTO tariffs (name, price) VALUES (?, ?)");
+        $stmt->execute([trim($input['name']), (float)$input['price']]);
+        jsonResponse(['success' => true, 'message' => 'Tariff added']);
+    } catch (PDOException $e) {
+        jsonResponse(['error' => 'Failed to add tariff'], 500);
+    }
+}
+
+function deleteTariff($id) {
+    try {
+        $pdo = getDB();
+        $stmt = $pdo->prepare("DELETE FROM tariffs WHERE id = ?");
+        $stmt->execute([$id]);
+        jsonResponse(['success' => true, 'message' => 'Tariff deleted']);
+    } catch (PDOException $e) {
+        jsonResponse(['error' => 'Failed to delete tariff'], 500);
     }
 }
