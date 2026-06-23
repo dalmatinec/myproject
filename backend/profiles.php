@@ -1,462 +1,480 @@
 <?php
-// =============================================
-// WeToo - Profiles API
-// =============================================
-
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
-
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    exit(0);
-}
+// profiles.php - CRUD обработчик анкет
 
 require_once 'config.php';
 
+// Получение действия
+$action = isset($_GET['action']) ? $_GET['action'] : '';
 $method = $_SERVER['REQUEST_METHOD'];
 
-// =============================================
-// Надежный роутинг через REQUEST_URI
-// =============================================
-$uri = $_SERVER['REQUEST_URI'] ?? '/';
-$path = parse_url($uri, PHP_URL_PATH);
-$path = str_replace('/api/profiles', '', $path);
-if (empty($path)) {
-    $path = '/';
-}
-
-// =============================================
-// Роутер
-// =============================================
-switch ($path) {
-    case '/':
-        if ($method === 'GET') {
-            handleGetList($pdo);
-        } elseif ($method === 'POST') {
-            handleCreate($pdo);
+switch ($method) {
+    case 'GET':
+        if ($action === 'get' && isset($_GET['id'])) {
+            getProfile($_GET['id']);
         } else {
-            http_response_code(405);
-            echo json_encode(['error' => 'Method not allowed']);
+            getProfiles();
         }
         break;
     
-    case '/cities':
-        if ($method === 'GET') {
-            handleGetCities($pdo);
-        } else {
-            http_response_code(405);
-            echo json_encode(['error' => 'Method not allowed']);
-        }
+    case 'POST':
+        requireAdmin();
+        createProfile();
         break;
     
-    case '/plans':
-        if ($method === 'GET') {
-            handleGetPlans($pdo);
-        } else {
-            http_response_code(405);
-            echo json_encode(['error' => 'Method not allowed']);
+    case 'PUT':
+        requireAdmin();
+        if (!isset($_GET['id'])) {
+            jsonResponse(['error' => 'Profile ID required'], 400);
         }
+        updateProfile($_GET['id']);
+        break;
+    
+    case 'DELETE':
+        requireAdmin();
+        if (!isset($_GET['id'])) {
+            jsonResponse(['error' => 'Profile ID required'], 400);
+        }
+        deleteProfile($_GET['id']);
         break;
     
     default:
-        if (preg_match('/^\/(\d+)$/', $path, $matches)) {
-            $id = (int)$matches[1];
-            if ($method === 'GET') {
-                handleGetOne($pdo, $id);
-            } elseif ($method === 'PUT') {
-                handleUpdate($pdo, $id);
-            } elseif ($method === 'DELETE') {
-                handleDelete($pdo, $id);
-            } else {
-                http_response_code(405);
-                echo json_encode(['error' => 'Method not allowed']);
-            }
-        } else {
-            http_response_code(404);
-            echo json_encode(['error' => 'Not found']);
-        }
-        break;
+        jsonResponse(['error' => 'Method not allowed'], 405);
 }
 
-// =============================================
-// Обработчики
-// =============================================
-
-/**
- * GET /api/profiles/
- * Получение списка анкет с фильтрами
- */
-function handleGetList($pdo) {
-    $params = $_GET;
-    
-    $page = max(1, (int)($params['page'] ?? 1));
-    $limit = min(50, max(1, (int)($params['limit'] ?? 12)));
-    $offset = ($page - 1) * $limit;
-    
-    // Базовый JOIN для планов (нужен всегда)
-    $join = "LEFT JOIN plans pl ON p.plan_id = pl.id";
-    $where = ["p.status = 'active'"];
-    $queryParams = [];
-    $orderBy = "p.created_at DESC";
-    
-    // Фильтр по городу
-    if (!empty($params['city_id'])) {
-        $where[] = "p.city_id = ?";
-        $queryParams[] = (int)$params['city_id'];
-    }
-    
-    // Фильтр по возрасту
-    if (!empty($params['age_from'])) {
-        $where[] = "p.age >= ?";
-        $queryParams[] = (int)$params['age_from'];
-    }
-    if (!empty($params['age_to'])) {
-        $where[] = "p.age <= ?";
-        $queryParams[] = (int)$params['age_to'];
-    }
-    
-    // Фильтр по статусу (для админки)
-    if (!empty($params['status']) && in_array($params['status'], ['pending', 'active', 'rejected', 'blocked', 'expired'])) {
-        $where = ["p.status = ?"];
-        $queryParams = [(string)$params['status']];
-    }
-    
-    // Фильтр VIP
-    if (!empty($params['vip']) && $params['vip'] == 1) {
-        $where[] = "pl.name IN ('VIP', 'ТОП')";
-        $where[] = "p.expires_at > NOW()";
-    }
-    
-    // Сортировка
-    if (!empty($params['sort'])) {
-        if ($params['sort'] === 'vip') {
-            $orderBy = "CASE WHEN pl.name IN ('VIP', 'ТОП') AND p.expires_at > NOW() THEN 1 ELSE 0 END DESC, p.created_at DESC";
-        } elseif ($params['sort'] === 'new') {
-            $orderBy = "p.created_at DESC";
-        } elseif ($params['sort'] === 'top') {
-            $orderBy = "CASE WHEN pl.name = 'ТОП' AND p.expires_at > NOW() THEN 1 ELSE 0 END DESC, p.created_at DESC";
-        }
-    }
-    
-    // Поиск
-    if (!empty($params['search'])) {
-        $search = '%' . $params['search'] . '%';
-        $where[] = "(p.name LIKE ? OR p.description LIKE ? OR p.telegram LIKE ?)";
-        $queryParams[] = $search;
-        $queryParams[] = $search;
-        $queryParams[] = $search;
-    }
-    
-    $whereSQL = empty($where) ? '' : 'WHERE ' . implode(' AND ', $where);
-    
-    // Счетчик
-    $countSQL = "SELECT COUNT(DISTINCT p.id) as total FROM profiles p $join $whereSQL";
-    $countStmt = $pdo->prepare($countSQL);
-    $countStmt->execute($queryParams);
-    $total = $countStmt->fetch()['total'];
-    
-    // Основной запрос
-    $fields = "p.*, c.name as city_name, pl.name as plan_name, 
-               (SELECT filename FROM profile_photos WHERE profile_id = p.id AND is_main = 1 LIMIT 1) as main_photo";
-    
-    $sql = "SELECT $fields FROM profiles p 
-            LEFT JOIN cities c ON p.city_id = c.id 
-            $join
-            $whereSQL 
-            GROUP BY p.id 
-            ORDER BY $orderBy 
-            LIMIT $offset, $limit";
-    
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($queryParams);
-    $profiles = $stmt->fetchAll();
-    
-    // Загружаем все фото для каждой анкеты
-    foreach ($profiles as &$profile) {
-        $photoStmt = $pdo->prepare("SELECT filename, is_main FROM profile_photos WHERE profile_id = ? ORDER BY sort_order, id");
-        $photoStmt->execute([$profile['id']]);
-        $profile['photos'] = $photoStmt->fetchAll();
-        $profile['photo_urls'] = array_column($profile['photos'], 'filename');
-    }
-    
-    echo json_encode([
-        'data' => $profiles,
-        'pagination' => [
-            'page' => $page,
-            'limit' => $limit,
-            'total' => (int)$total,
-            'pages' => ceil($total / $limit)
-        ]
-    ]);
-}
-
-/**
- * GET /api/profiles/cities
- */
-function handleGetCities($pdo) {
-    $stmt = $pdo->query("SELECT id, name FROM cities WHERE is_active = 1 ORDER BY sort_order, name");
-    echo json_encode($stmt->fetchAll());
-}
-
-/**
- * GET /api/profiles/plans
- */
-function handleGetPlans($pdo) {
-    $stmt = $pdo->query("SELECT id, name, price_usdt, price_btc, price_eth, duration_days FROM plans WHERE is_active = 1 ORDER BY sort_order");
-    echo json_encode($stmt->fetchAll());
-}
-
-/**
- * GET /api/profiles/{id}
- */
-function handleGetOne($pdo, $id) {
-    $stmt = $pdo->prepare("
-        SELECT p.*, c.name as city_name, pl.name as plan_name 
-        FROM profiles p 
-        LEFT JOIN cities c ON p.city_id = c.id 
-        LEFT JOIN plans pl ON p.plan_id = pl.id
-        WHERE p.id = ? AND p.status = 'active'
-    ");
-    $stmt->execute([$id]);
-    $profile = $stmt->fetch();
-    
-    if (!$profile) {
-        http_response_code(404);
-        echo json_encode(['error' => 'Profile not found']);
-        return;
-    }
-    
-    $photoStmt = $pdo->prepare("SELECT filename, is_main FROM profile_photos WHERE profile_id = ? ORDER BY sort_order, id");
-    $photoStmt->execute([$id]);
-    $profile['photos'] = $photoStmt->fetchAll();
-    $profile['photo_urls'] = array_column($profile['photos'], 'filename');
-    
-    $pdo->prepare("UPDATE profiles SET views_count = views_count + 1 WHERE id = ?")->execute([$id]);
-    
-    $stmt = $pdo->prepare("INSERT INTO views (profile_id, ip, user_agent) VALUES (?, ?, ?)");
-    $stmt->execute([$id, $_SERVER['REMOTE_ADDR'] ?? null, $_SERVER['HTTP_USER_AGENT'] ?? null]);
-    
-    echo json_encode($profile);
-}
-
-/**
- * POST /api/profiles/
- */
-function handleCreate($pdo) {
-    $name = trim($_POST['name'] ?? '');
-    $age = (int)($_POST['age'] ?? 0);
-    $city_id = (int)($_POST['city_id'] ?? 0);
-    $description = trim($_POST['description'] ?? '');
-    $telegram = trim($_POST['telegram'] ?? '');
-    $whatsapp = trim($_POST['whatsapp'] ?? '');
-    $price = !empty($_POST['price']) ? (float)$_POST['price'] : null;
-    $plan_id = (int)($_POST['plan_id'] ?? 0);
-    
-    if (empty($name) || strlen($name) < 2) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Имя должно быть минимум 2 символа']);
-        return;
-    }
-    
-    if ($age < 18 || $age > 120) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Возраст должен быть от 18 до 120 лет']);
-        return;
-    }
-    
-    if ($city_id <= 0) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Выберите город']);
-        return;
-    }
-    
-    if (empty($description) || strlen($description) < 10) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Описание должно быть минимум 10 символов']);
-        return;
-    }
-    
-    if (empty($telegram) || strpos($telegram, '@') !== 0) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Укажите корректный Telegram (@username)']);
-        return;
-    }
-    
-    if ($plan_id <= 0) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Выберите тариф']);
-        return;
-    }
-    
-    $stmt = $pdo->prepare("SELECT id FROM cities WHERE id = ? AND is_active = 1");
-    $stmt->execute([$city_id]);
-    if (!$stmt->fetch()) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Город не найден или отключен']);
-        return;
-    }
-    
-    $stmt = $pdo->prepare("SELECT id, duration_days FROM plans WHERE id = ? AND is_active = 1");
-    $stmt->execute([$plan_id]);
-    $plan = $stmt->fetch();
-    if (!$plan) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Тариф не найден или отключен']);
-        return;
-    }
-    
-    if (!isset($_FILES['photos']) || empty($_FILES['photos']['name'][0])) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Загрузите хотя бы одно фото']);
-        return;
-    }
-    
-    $photoCount = count($_FILES['photos']['name']);
-    if ($photoCount > MAX_PHOTOS) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Максимум ' . MAX_PHOTOS . ' фотографий']);
-        return;
-    }
-    
-    $slug = generateSlug($name);
-    $pdo->beginTransaction();
-    
+// Получение списка анкет с фильтрами
+function getProfiles() {
     try {
-        $stmt = $pdo->prepare("
-            INSERT INTO profiles (slug, city_id, plan_id, name, age, description, telegram, whatsapp, price, status) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
-        ");
-        $stmt->execute([$slug, $city_id, $plan_id, $name, $age, $description, $telegram, $whatsapp, $price]);
-        $profileId = $pdo->lastInsertId();
+        $pdo = getDB();
         
-        createDirectories();
+        // Параметры фильтрации
+        $cityId = isset($_GET['city_id']) ? (int)$_GET['city_id'] : null;
+        $ageFrom = isset($_GET['age_from']) ? (int)$_GET['age_from'] : null;
+        $ageTo = isset($_GET['age_to']) ? (int)$_GET['age_to'] : null;
+        $isVip = isset($_GET['vip']) ? filter_var($_GET['vip'], FILTER_VALIDATE_BOOLEAN) : null;
+        $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+        $sort = isset($_GET['sort']) ? $_GET['sort'] : 'created_at_desc';
+        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 20;
+        $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
         
-        $uploadedFiles = [];
-        $files = $_FILES['photos'];
+        // Базовый запрос
+        $sql = "SELECT 
+                    p.*,
+                    c.name as city_name,
+                    t.name as tariff_name,
+                    (SELECT file_name FROM profile_photos WHERE profile_id = p.id AND is_main = 1 LIMIT 1) as main_photo
+                FROM profiles p
+                LEFT JOIN cities c ON p.city_id = c.id
+                LEFT JOIN tariffs t ON p.tariff_id = t.id
+                WHERE p.status = 'active'";
         
-        for ($i = 0; $i < $photoCount; $i++) {
-            if ($files['error'][$i] !== UPLOAD_ERR_OK) {
-                continue;
-            }
-            
-            $ext = strtolower(pathinfo($files['name'][$i], PATHINFO_EXTENSION));
-            if (!in_array($ext, ALLOWED_EXTENSIONS)) {
-                continue;
-            }
-            
-            if ($files['size'][$i] > MAX_FILE_SIZE) {
-                continue;
-            }
-            
-            $filename = 'profile_' . $profileId . '_' . time() . '_' . $i . '.' . $ext;
-            $path = IMAGES_DIR . $filename;
-            
-            if (move_uploaded_file($files['tmp_name'][$i], $path)) {
-                $is_main = ($i === 0) ? 1 : 0;
-                $stmt = $pdo->prepare("INSERT INTO profile_photos (profile_id, filename, sort_order, is_main) VALUES (?, ?, ?, ?)");
-                $stmt->execute([$profileId, $filename, $i, $is_main]);
-                $uploadedFiles[] = $filename;
-            }
+        $params = [];
+        
+        // Фильтр по городу
+        if ($cityId) {
+            $sql .= " AND p.city_id = ?";
+            $params[] = $cityId;
         }
         
-        if (empty($uploadedFiles)) {
-            throw new Exception('Не удалось загрузить фотографии');
+        // Фильтр по возрасту
+        if ($ageFrom) {
+            $sql .= " AND p.age >= ?";
+            $params[] = $ageFrom;
+        }
+        if ($ageTo) {
+            $sql .= " AND p.age <= ?";
+            $params[] = $ageTo;
         }
         
-        $pdo->commit();
+        // Фильтр по VIP
+        if ($isVip !== null) {
+            $sql .= " AND p.is_vip = ?";
+            $params[] = $isVip ? 1 : 0;
+        }
         
-        echo json_encode([
+        // Поиск
+        if (!empty($search)) {
+            $sql .= " AND (p.name LIKE ? OR p.description LIKE ?)";
+            $searchTerm = '%' . $search . '%';
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+        }
+        
+        // Сортировка
+        switch ($sort) {
+            case 'price_asc':
+                $sql .= " ORDER BY t.price ASC";
+                break;
+            case 'price_desc':
+                $sql .= " ORDER BY t.price DESC";
+                break;
+            case 'name_asc':
+                $sql .= " ORDER BY p.name ASC";
+                break;
+            case 'name_desc':
+                $sql .= " ORDER BY p.name DESC";
+                break;
+            case 'created_at_asc':
+                $sql .= " ORDER BY p.created_at ASC";
+                break;
+            case 'created_at_desc':
+            default:
+                $sql .= " ORDER BY p.created_at DESC";
+                break;
+        }
+        
+        // Пагинация с использованием именованных параметров
+        $sql .= " LIMIT :limit OFFSET :offset";
+        
+        $stmt = $pdo->prepare($sql);
+        
+        // Привязка параметров фильтров
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key + 1, $value);
+        }
+        
+        // Привязка LIMIT и OFFSET как целых чисел
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        
+        $stmt->execute();
+        $profiles = $stmt->fetchAll();
+        
+        // Получение общего количества
+        $countSql = "SELECT COUNT(*) as total FROM profiles p WHERE p.status = 'active'";
+        $countParams = [];
+        
+        // Добавляем те же фильтры для подсчета
+        if ($cityId) {
+            $countSql .= " AND p.city_id = ?";
+            $countParams[] = $cityId;
+        }
+        if ($ageFrom) {
+            $countSql .= " AND p.age >= ?";
+            $countParams[] = $ageFrom;
+        }
+        if ($ageTo) {
+            $countSql .= " AND p.age <= ?";
+            $countParams[] = $ageTo;
+        }
+        if ($isVip !== null) {
+            $countSql .= " AND p.is_vip = ?";
+            $countParams[] = $isVip ? 1 : 0;
+        }
+        if (!empty($search)) {
+            $countSql .= " AND (p.name LIKE ? OR p.description LIKE ?)";
+            $countParams[] = $searchTerm;
+            $countParams[] = $searchTerm;
+        }
+        
+        $countStmt = $pdo->prepare($countSql);
+        $countStmt->execute($countParams);
+        $total = $countStmt->fetch()['total'];
+        
+        jsonResponse([
             'success' => true,
-            'id' => $profileId,
-            'message' => 'Анкета создана и отправлена на модерацию'
+            'data' => $profiles,
+            'pagination' => [
+                'total' => (int)$total,
+                'limit' => $limit,
+                'offset' => $offset
+            ]
         ]);
         
-    } catch (Exception $e) {
-        $pdo->rollBack();
-        http_response_code(500);
-        echo json_encode(['error' => $e->getMessage()]);
-    }
-}
-
-/**
- * PUT /api/profiles/{id}
- */
-function handleUpdate($pdo, $id) {
-    $payload = requireAdmin($pdo);
-    if (!$payload) {
-        return;
-    }
-    
-    $input = file_get_contents('php://input');
-    $data = json_decode($input, true);
-    
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Invalid JSON']);
-        return;
-    }
-    
-    $stmt = $pdo->prepare("SELECT id FROM profiles WHERE id = ?");
-    $stmt->execute([$id]);
-    if (!$stmt->fetch()) {
-        http_response_code(404);
-        echo json_encode(['error' => 'Profile not found']);
-        return;
-    }
-    
-    $fields = [];
-    $params = [];
-    
-    $allowedFields = ['name', 'age', 'city_id', 'description', 'telegram', 'whatsapp', 'price', 'status'];
-    foreach ($allowedFields as $field) {
-        if (isset($data[$field])) {
-            $fields[] = "$field = ?";
-            $params[] = $data[$field];
+    } catch (PDOException $e) {
+        if (DEBUG_MODE) {
+            jsonResponse(['error' => 'Database error: ' . $e->getMessage()], 500);
+        } else {
+            jsonResponse(['error' => 'Failed to fetch profiles'], 500);
         }
     }
-    
-    if (empty($fields)) {
-        http_response_code(400);
-        echo json_encode(['error' => 'No fields to update']);
-        return;
-    }
-    
-    $params[] = $id;
-    $sql = "UPDATE profiles SET " . implode(', ', $fields) . " WHERE id = ?";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
-    
-    echo json_encode([
-        'success' => true,
-        'message' => 'Profile updated'
-    ]);
 }
 
-/**
- * DELETE /api/profiles/{id}
- */
-function handleDelete($pdo, $id) {
-    $payload = requireAdmin($pdo);
-    if (!$payload) {
-        return;
+// Получение одной анкеты по ID
+function getProfile($id) {
+    try {
+        $pdo = getDB();
+        
+        // Получение профиля
+        $stmt = $pdo->prepare("
+            SELECT 
+                p.*,
+                c.name as city_name,
+                t.name as tariff_name,
+                t.price as tariff_price
+            FROM profiles p
+            LEFT JOIN cities c ON p.city_id = c.id
+            LEFT JOIN tariffs t ON p.tariff_id = t.id
+            WHERE p.id = ?
+        ");
+        $stmt->execute([$id]);
+        $profile = $stmt->fetch();
+        
+        if (!$profile) {
+            jsonResponse(['error' => 'Profile not found'], 404);
+        }
+        
+        // Получение всех фото
+        $stmt = $pdo->prepare("
+            SELECT id, file_name, is_main, sort_order 
+            FROM profile_photos 
+            WHERE profile_id = ? 
+            ORDER BY sort_order ASC, is_main DESC
+        ");
+        $stmt->execute([$id]);
+        $photos = $stmt->fetchAll();
+        
+        // Проверка накрутки просмотров через сессию
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        if (!isset($_SESSION['viewed_profiles'])) {
+            $_SESSION['viewed_profiles'] = [];
+        }
+        
+        // Если профиль еще не просматривался в этой сессии
+        if (!in_array($id, $_SESSION['viewed_profiles'])) {
+            // Увеличение счетчика просмотров
+            $stmt = $pdo->prepare("UPDATE profiles SET views = views + 1 WHERE id = ?");
+            $stmt->execute([$id]);
+            
+            // Запись ID в сессию
+            $_SESSION['viewed_profiles'][] = $id;
+            
+            // Запись статистики
+            logStat('profile_view', $id);
+        }
+        
+        jsonResponse([
+            'success' => true,
+            'data' => [
+                'profile' => $profile,
+                'photos' => $photos
+            ]
+        ]);
+        
+    } catch (PDOException $e) {
+        if (DEBUG_MODE) {
+            jsonResponse(['error' => 'Database error: ' . $e->getMessage()], 500);
+        } else {
+            jsonResponse(['error' => 'Failed to fetch profile'], 500);
+        }
     }
-    
-    $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM payments WHERE profile_id = ?");
-    $stmt->execute([$id]);
-    $payments = $stmt->fetch()['count'];
-    
-    if ($payments > 0) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Cannot delete profile with existing payments. Delete payments first.']);
-        return;
+}
+
+// Создание анкеты
+function createProfile() {
+    try {
+        $pdo = getDB();
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        if (!$input) {
+            jsonResponse(['error' => 'Invalid input data'], 400);
+        }
+        
+        // Валидация обязательных полей
+        $required = ['name', 'age', 'city_id'];
+        foreach ($required as $field) {
+            if (!isset($input[$field]) || empty($input[$field])) {
+                jsonResponse(['error' => "Field '$field' is required"], 400);
+            }
+        }
+        
+        // Подготовка данных
+        $name = sanitize($input['name']);
+        $age = (int)$input['age'];
+        $cityId = (int)$input['city_id'];
+        $tariffId = isset($input['tariff_id']) && !empty($input['tariff_id']) ? (int)$input['tariff_id'] : null;
+        $telegram = isset($input['telegram']) ? sanitize($input['telegram']) : null;
+        $whatsapp = isset($input['whatsapp']) ? sanitize($input['whatsapp']) : null;
+        $description = isset($input['description']) ? sanitize($input['description']) : null;
+        $status = isset($input['status']) ? sanitize($input['status']) : 'pending';
+        $isVip = isset($input['is_vip']) ? (int)$input['is_vip'] : 0;
+        $mainPhoto = isset($input['main_photo']) ? sanitize($input['main_photo']) : null;
+        
+        // Проверка существования города
+        $stmt = $pdo->prepare("SELECT id FROM cities WHERE id = ?");
+        $stmt->execute([$cityId]);
+        if (!$stmt->fetch()) {
+            jsonResponse(['error' => 'City not found'], 400);
+        }
+        
+        // Проверка существования тарифа (если указан)
+        if ($tariffId) {
+            $stmt = $pdo->prepare("SELECT id FROM tariffs WHERE id = ?");
+            $stmt->execute([$tariffId]);
+            if (!$stmt->fetch()) {
+                jsonResponse(['error' => 'Tariff not found'], 400);
+            }
+        }
+        
+        // Вставка профиля
+        $stmt = $pdo->prepare("
+            INSERT INTO profiles (name, age, city_id, tariff_id, telegram, whatsapp, description, status, is_vip, main_photo)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $stmt->execute([$name, $age, $cityId, $tariffId, $telegram, $whatsapp, $description, $status, $isVip, $mainPhoto]);
+        $profileId = $pdo->lastInsertId();
+        
+        // Сохранение фото (если переданы)
+        if (isset($input['photos']) && is_array($input['photos'])) {
+            foreach ($input['photos'] as $index => $photo) {
+                $fileName = sanitize($photo['file_name']);
+                $isMain = isset($photo['is_main']) ? (int)$photo['is_main'] : ($index === 0 ? 1 : 0);
+                $sortOrder = isset($photo['sort_order']) ? (int)$photo['sort_order'] : $index;
+                
+                $stmt = $pdo->prepare("
+                    INSERT INTO profile_photos (profile_id, file_name, is_main, sort_order)
+                    VALUES (?, ?, ?, ?)
+                ");
+                $stmt->execute([$profileId, $fileName, $isMain, $sortOrder]);
+            }
+        }
+        
+        jsonResponse([
+            'success' => true,
+            'message' => 'Profile created successfully',
+            'profile_id' => $profileId
+        ]);
+        
+    } catch (PDOException $e) {
+        if (DEBUG_MODE) {
+            jsonResponse(['error' => 'Database error: ' . $e->getMessage()], 500);
+        } else {
+            jsonResponse(['error' => 'Failed to create profile'], 500);
+        }
     }
-    
-    $stmt = $pdo->prepare("DELETE FROM profiles WHERE id = ?");
-    $stmt->execute([$id]);
-    
-    echo json_encode([
-        'success' => true,
-        'message' => 'Profile deleted'
-    ]);
+}
+
+// Обновление анкеты
+function updateProfile($id) {
+    try {
+        $pdo = getDB();
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        if (!$input) {
+            jsonResponse(['error' => 'Invalid input data'], 400);
+        }
+        
+        // Проверка существования профиля
+        $stmt = $pdo->prepare("SELECT id FROM profiles WHERE id = ?");
+        $stmt->execute([$id]);
+        if (!$stmt->fetch()) {
+            jsonResponse(['error' => 'Profile not found'], 404);
+        }
+        
+        // Подготовка данных для обновления
+        $fields = [];
+        $params = [];
+        
+        $allowedFields = ['name', 'age', 'city_id', 'tariff_id', 'telegram', 'whatsapp', 'description', 'status', 'is_vip', 'main_photo'];
+        foreach ($allowedFields as $field) {
+            if (isset($input[$field])) {
+                if ($field === 'age' || $field === 'city_id' || $field === 'tariff_id' || $field === 'is_vip') {
+                    $fields[] = "$field = ?";
+                    $params[] = (int)$input[$field];
+                } else {
+                    $fields[] = "$field = ?";
+                    $params[] = sanitize($input[$field]);
+                }
+            }
+        }
+        
+        if (empty($fields)) {
+            jsonResponse(['error' => 'No fields to update'], 400);
+        }
+        
+        $params[] = $id;
+        $sql = "UPDATE profiles SET " . implode(', ', $fields) . " WHERE id = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        
+        // Обновление фото (если переданы)
+        if (isset($input['photos']) && is_array($input['photos'])) {
+            // Удаление старых фото
+            $stmt = $pdo->prepare("SELECT file_name FROM profile_photos WHERE profile_id = ?");
+            $stmt->execute([$id]);
+            $oldPhotos = $stmt->fetchAll();
+            
+            // Физическое удаление файлов
+            foreach ($oldPhotos as $photo) {
+                $filePath = UPLOAD_DIR . $photo['file_name'];
+                if (file_exists($filePath)) {
+                    @unlink($filePath);
+                }
+            }
+            
+            // Удаление записей из БД
+            $stmt = $pdo->prepare("DELETE FROM profile_photos WHERE profile_id = ?");
+            $stmt->execute([$id]);
+            
+            // Добавление новых фото
+            foreach ($input['photos'] as $index => $photo) {
+                $fileName = sanitize($photo['file_name']);
+                $isMain = isset($photo['is_main']) ? (int)$photo['is_main'] : ($index === 0 ? 1 : 0);
+                $sortOrder = isset($photo['sort_order']) ? (int)$photo['sort_order'] : $index;
+                
+                $stmt = $pdo->prepare("
+                    INSERT INTO profile_photos (profile_id, file_name, is_main, sort_order)
+                    VALUES (?, ?, ?, ?)
+                ");
+                $stmt->execute([$id, $fileName, $isMain, $sortOrder]);
+            }
+        }
+        
+        jsonResponse([
+            'success' => true,
+            'message' => 'Profile updated successfully'
+        ]);
+        
+    } catch (PDOException $e) {
+        if (DEBUG_MODE) {
+            jsonResponse(['error' => 'Database error: ' . $e->getMessage()], 500);
+        } else {
+            jsonResponse(['error' => 'Failed to update profile'], 500);
+        }
+    }
+}
+
+// Удаление анкеты
+function deleteProfile($id) {
+    try {
+        $pdo = getDB();
+        
+        // Проверка существования профиля
+        $stmt = $pdo->prepare("SELECT id FROM profiles WHERE id = ?");
+        $stmt->execute([$id]);
+        if (!$stmt->fetch()) {
+            jsonResponse(['error' => 'Profile not found'], 404);
+        }
+        
+        // Получение всех фото перед удалением
+        $stmt = $pdo->prepare("SELECT file_name FROM profile_photos WHERE profile_id = ?");
+        $stmt->execute([$id]);
+        $photos = $stmt->fetchAll();
+        
+        // Физическое удаление файлов изображений
+        foreach ($photos as $photo) {
+            $filePath = UPLOAD_DIR . $photo['file_name'];
+            if (file_exists($filePath)) {
+                @unlink($filePath);
+            }
+        }
+        
+        // Удаление профиля (каскадно удалит фото и платежи)
+        $stmt = $pdo->prepare("DELETE FROM profiles WHERE id = ?");
+        $stmt->execute([$id]);
+        
+        jsonResponse([
+            'success' => true,
+            'message' => 'Profile deleted successfully'
+        ]);
+        
+    } catch (PDOException $e) {
+        if (DEBUG_MODE) {
+            jsonResponse(['error' => 'Database error: ' . $e->getMessage()], 500);
+        } else {
+            jsonResponse(['error' => 'Failed to delete profile'], 500);
+        }
+    }
 }
