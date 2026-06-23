@@ -1,268 +1,301 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Создание анкеты — WeToo</title>
-    <meta name="description" content="Создай анкету для размещения на WeToo" />
-    <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подать анкету - PrivatClub</title>
+    <meta name="description" content="Заполните анкету для размещения в PrivatClub. Загрузите фото, выберите тариф и станьте частью элитного сообщества.">
+    <link rel="stylesheet" href="/frontend/style.css">
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
 </head>
 <body>
+    <!-- ОВЕРЛЕЙ ДЛЯ МЕНЮ -->
+    <div id="menu-overlay"></div>
 
-    <!-- ===== HEADER ===== -->
-    <header class="header">
-        <div class="container header-inner">
+    <!-- ШАПКА -->
+    <header id="main-header" role="banner">
+        <div class="container header-container">
             <div class="logo">
-                <a href="index.html">WeToo</a>
+                <a href="/frontend/index.html" aria-label="PrivatClub">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="4" y="4" width="32" height="32" rx="8" stroke="#6C63FF" stroke-width="2"/>
+                        <path d="M20 10L22.5 17.5L30 18L24 23L25.5 30.5L20 26.5L14.5 30.5L16 23L10 18L17.5 17.5L20 10Z" fill="#6C63FF"/>
+                    </svg>
+                    <span>PrivatClub</span>
+                </a>
             </div>
-            <button class="burger" id="burgerBtn" aria-label="Меню">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <nav class="nav" id="mainNav">
-                <ul>
-                    <li><a href="index.html">Главная</a></li>
-                    <li><a href="profiles.html">Анкеты</a></li>
-                    <li><a href="news.html">Новости</a></li>
-                    <li><a href="contacts.html">Контакты</a></li>
-                    <li><a href="about.html">О нас</a></li>
+            
+            <nav id="main-nav" role="navigation" aria-label="Главная навигация">
+                <ul class="nav-menu">
+                    <li>
+                        <a href="/frontend/index.html">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M2 10L10 3L18 10V17C18 17.5523 17.5523 18 17 18H3C2.44772 18 2 17.5523 2 17V10Z"/>
+                                <path d="M7 14V18H13V14H7Z"/>
+                            </svg>
+                            Главная
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/frontend/profiles.html">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="7" cy="7" r="4"/>
+                                <circle cx="15" cy="15" r="3"/>
+                                <path d="M3 17C5 15 9 15 11 17"/>
+                            </svg>
+                            Анкеты
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/frontend/news.html">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="3" y="4" width="14" height="12" rx="1"/>
+                                <line x1="6" y1="8" x2="14" y2="8"/>
+                                <line x1="6" y1="11" x2="12" y2="11"/>
+                                <line x1="6" y1="14" x2="10" y2="14"/>
+                            </svg>
+                            Новости
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/frontend/contacts.html">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M2 4C2 3.44772 2.44772 3 3 3H17C17.5523 3 18 3.44772 18 4V16C18 16.5523 17.5523 17 17 17H3C2.44772 17 2 16.5523 2 16V4Z"/>
+                                <path d="M2 5L10 11L18 5"/>
+                            </svg>
+                            Контакты
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/frontend/about.html">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="10" cy="7" r="3"/>
+                                <path d="M3 17C5 13 15 13 17 17"/>
+                                <circle cx="10" cy="10" r="9"/>
+                            </svg>
+                            О нас
+                        </a>
+                    </li>
                 </ul>
-                <a href="add-profile.html" class="btn btn-primary btn-sm">➕ Подать анкету</a>
             </nav>
+            
+            <div class="header-actions">
+                <button class="lang-toggle" data-lang="ru" aria-label="Русский язык">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M10 1C7 1 4 4 4 10C4 16 7 19 10 19" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M10 1C13 1 16 4 16 10C16 16 13 19 10 19" stroke="currentColor" stroke-width="1.5"/>
+                        <line x1="1" y1="10" x2="19" y2="10" stroke="currentColor" stroke-width="1.5"/>
+                    </svg>
+                </button>
+                <button class="lang-toggle" data-lang="en" aria-label="English language">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5"/>
+                        <line x1="1" y1="10" x2="19" y2="10" stroke="currentColor" stroke-width="1.5"/>
+                        <line x1="10" y1="1" x2="10" y2="19" stroke="currentColor" stroke-width="1.5"/>
+                    </svg>
+                </button>
+                <button class="burger-menu" aria-label="Открыть меню" aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
         </div>
     </header>
 
-    <!-- ===== ФОРМА ===== -->
-    <section class="form-page">
-        <div class="container">
-            <div class="form-card">
-                <h1>Создание новой анкеты</h1>
-                <p class="subtitle">Заполните форму и отправьте анкету на модерацию</p>
+    <!-- МОБИЛЬНОЕ МЕНЮ -->
+    <div id="mobile-menu" role="dialog" aria-label="Мобильная навигация" aria-modal="true">
+        <button class="menu-close" aria-label="Закрыть меню">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </button>
+        <nav role="navigation">
+            <ul class="mobile-nav-menu">
+                <li>
+                    <a href="/frontend/index.html">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M2 10L10 3L18 10V17C18 17.5523 17.5523 18 17 18H3C2.44772 18 2 17.5523 2 17V10Z"/>
+                            <path d="M7 14V18H13V14H7Z"/>
+                        </svg>
+                        Главная
+                    </a>
+                </li>
+                <li>
+                    <a href="/frontend/profiles.html">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="7" cy="7" r="4"/>
+                            <circle cx="15" cy="15" r="3"/>
+                            <path d="M3 17C5 15 9 15 11 17"/>
+                        </svg>
+                        Анкеты
+                    </a>
+                </li>
+                <li>
+                    <a href="/frontend/news.html">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <rect x="3" y="4" width="14" height="12" rx="1"/>
+                            <line x1="6" y1="8" x2="14" y2="8"/>
+                            <line x1="6" y1="11" x2="12" y2="11"/>
+                            <line x1="6" y1="14" x2="10" y2="14"/>
+                        </svg>
+                        Новости
+                    </a>
+                </li>
+                <li>
+                    <a href="/frontend/contacts.html">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M2 4C2 3.44772 2.44772 3 3 3H17C17.5523 3 18 3.44772 18 4V16C18 16.5523 17.5523 17 17 17H3C2.44772 17 2 16.5523 2 16V4Z"/>
+                            <path d="M2 5L10 11L18 5"/>
+                        </svg>
+                        Контакты
+                    </a>
+                </li>
+                <li>
+                    <a href="/frontend/about.html">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="10" cy="7" r="3"/>
+                            <path d="M3 17C5 13 15 13 17 17"/>
+                            <circle cx="10" cy="10" r="9"/>
+                        </svg>
+                        О нас
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
 
-                <form id="profileForm" enctype="multipart/form-data">
-                    <!-- Имя -->
-                    <div class="form-group">
-                        <label>Ваше имя <span class="required">*</span></label>
-                        <input type="text" id="formName" class="form-control" placeholder="Введите имя" required />
-                    </div>
+    <!-- ОСНОВНОЙ КОНТЕНТ -->
+    <main id="main-content" role="main">
+        <!-- ЗАГОЛОВОК СТРАНИЦЫ -->
+        <section class="page-header">
+            <div class="container">
+                <h1 class="page-title" data-translate="add_profile_title">Подать анкету</h1>
+                <p class="page-subtitle" data-translate="add_profile_subtitle">Заполните форму и станьте частью элитного сообщества PrivatClub</p>
+            </div>
+        </section>
 
-                    <!-- Возраст -->
-                    <div class="form-group">
-                        <label>Возраст <span class="required">*</span></label>
-                        <input type="number" id="formAge" class="form-control" placeholder="18+" min="18" max="120" required />
-                        <div class="hint">От 18 до 120 лет</div>
-                    </div>
+        <!-- ФОРМА СОЗДАНИЯ АНКЕТЫ -->
+        <section id="add-profile-section" class="add-profile-section">
+            <div class="container">
+                <form id="add-profile-form" enctype="multipart/form-data" novalidate>
+                    <div class="form-grid">
+                        <!-- ЛЕВАЯ КОЛОНКА: ОСНОВНАЯ ИНФОРМАЦИЯ -->
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="profile-name" data-translate="add_profile_name">Имя / Псевдоним</label>
+                                <input type="text" id="profile-name" name="name" required data-translate-placeholder="add_profile_name_placeholder">
+                            </div>
 
-                    <!-- Город -->
-                    <div class="form-group">
-                        <label>Город <span class="required">*</span></label>
-                        <select id="formCity" class="form-control" data-cities data-placeholder="Выберите город..." required>
-                            <option value="">Выберите город...</option>
-                        </select>
-                    </div>
+                            <div class="form-group">
+                                <label for="profile-city-select" data-translate="add_profile_city">Город</label>
+                                <select id="profile-city-select" name="city_id" required>
+                                    <option value="" data-translate="select_city_add">Выберите город</option>
+                                </select>
+                            </div>
 
-                    <!-- Telegram -->
-                    <div class="form-group">
-                        <label>Ваш Telegram (для связи) <span class="required">*</span></label>
-                        <input type="text" id="formTelegram" class="form-control" placeholder="@username" required />
-                        <div class="hint">Укажите @username для связи</div>
-                    </div>
+                            <div class="form-group">
+                                <label for="profile-age" data-translate="add_profile_age">Возраст</label>
+                                <input type="number" id="profile-age" name="age" min="18" max="99" required data-translate-placeholder="add_profile_age_placeholder">
+                            </div>
 
-                    <!-- WhatsApp -->
-                    <div class="form-group">
-                        <label>Телефон (необязательно)</label>
-                        <input type="text" id="formWhatsapp" class="form-control" placeholder="+7 (999) 000-00-00" />
-                        <div class="hint">Укажите номер для WhatsApp (если есть)</div>
-                    </div>
+                            <div class="form-group">
+                                <label for="profile-description" data-translate="add_profile_description">О себе</label>
+                                <textarea id="profile-description" name="description" rows="5" required data-translate-placeholder="add_profile_description_placeholder"></textarea>
+                            </div>
 
-                    <!-- Цена -->
-                    <div class="form-group">
-                        <label>Цена за услуги (необязательно)</label>
-                        <input type="number" id="formPrice" class="form-control" placeholder="5000" min="0" step="100" />
-                        <div class="hint">Укажите цену в рублях, если хотите отображать её в анкете</div>
-                    </div>
+                            <div class="form-group">
+                                <label for="profile-telegram" data-translate="add_profile_telegram">Telegram</label>
+                                <input type="text" id="profile-telegram" name="telegram" data-translate-placeholder="add_profile_telegram_placeholder">
+                            </div>
 
-                    <!-- Описание -->
-                    <div class="form-group">
-                        <label>О себе <span class="required">*</span></label>
-                        <textarea id="formDescription" class="form-control" placeholder="Расскажите о себе, своих навыках и услугах..." required></textarea>
-                        <div class="hint">Минимум 10 символов</div>
-                    </div>
-
-                    <!-- Фотографии -->
-                    <div class="form-group">
-                        <label>Фотографии анкеты <span class="required">*</span></label>
-                        <div class="file-upload-area" id="fileUploadArea">
-                            <input type="file" id="formPhotos" accept="image/*" multiple data-preview="photoPreview" data-max="5" />
-                            <div class="icon">📸</div>
-                            <div class="text">
-                                <strong>Выбрать фото</strong> (макс. 5 шт.)<br />
-                                <span style="font-size:12px;color:var(--text-light);">Первое фото станет главным</span>
+                            <div class="form-group">
+                                <label for="profile-whatsapp" data-translate="add_profile_whatsapp">WhatsApp</label>
+                                <input type="text" id="profile-whatsapp" name="whatsapp" data-translate-placeholder="add_profile_whatsapp_placeholder">
                             </div>
                         </div>
-                        <div class="file-preview" id="photoPreview">
-                            <div style="color:var(--text-light);font-size:13px;text-align:center;padding:10px;width:100%;">Фото не выбраны</div>
-                        </div>
-                        <div class="hint">Формат: JPG, PNG, GIF, WEBP. Максимум 5 МБ на файл.</div>
-                    </div>
 
-                    <!-- Тарифы -->
-                    <div class="form-group">
-                        <label>Выберите тариф размещения <span class="required">*</span></label>
-                        <div class="plans-grid" id="plansContainer" data-plans>
-                            <div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--text-light);">Загрузка тарифов...</div>
+                        <!-- ПРАВАЯ КОЛОНКА: ФОТО И ТАРИФ -->
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label data-translate="add_profile_photos">Фотографии</label>
+                                <input type="file" id="profile-photos" name="photos[]" accept="image/jpeg,image/png,image/gif,image/webp" multiple>
+                                <div id="photos-preview"></div>
+                                <small data-translate="add_profile_photos_hint">Максимум 5 фотографий. Размер каждой не более 5MB.</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label data-translate="add_profile_tariff">Выберите тариф</label>
+                                <div class="tariff-options">
+                                    <div class="tariff-option">
+                                        <input type="radio" id="tariff-regular" name="is_vip" value="0" checked>
+                                        <label for="tariff-regular" class="tariff-label">
+                                            <span class="tariff-name" data-translate="tariff_regular">Обычный</span>
+                                            <span class="tariff-desc" data-translate="tariff_regular_desc">Стандартное размещение</span>
+                                        </label>
+                                    </div>
+                                    <div class="tariff-option">
+                                        <input type="radio" id="tariff-vip" name="is_vip" value="1">
+                                        <label for="tariff-vip" class="tariff-label tariff-vip-label">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M12 2L14.5 9H21L15.5 14L18 21L12 16.5L6 21L8.5 14L3 9H9.5L12 2Z"/>
+                                            </svg>
+                                            <span class="tariff-name" data-translate="tariff_vip">VIP</span>
+                                            <span class="tariff-desc" data-translate="tariff_vip_desc">Премиум-размещение с повышенной видимостью</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-submit" id="btn-submit-profile" data-translate="add_profile_submit">Продолжить к оплате</button>
                         </div>
                     </div>
-
-                    <!-- Кнопка отправки -->
-                    <button type="submit" class="btn btn-primary form-submit" id="submitBtn">💰 Перейти к оплате</button>
-                    <div id="formError" style="display:none;margin-top:12px;padding:12px;background:#FDEDEC;color:#E74C3C;border-radius:var(--radius-sm);text-align:center;"></div>
                 </form>
             </div>
-        </div>
-    </section>
+        </section>
+    </main>
 
-    <!-- ===== FOOTER ===== -->
-    <footer class="footer">
-        <div class="container footer-inner">
-            <div class="footer-brand">
-                <div class="logo">WeToo</div>
-                <p>Платформа проверенных анкет</p>
-            </div>
-            <div class="footer-links">
-                <a href="index.html">Главная</a>
-                <a href="profiles.html">Анкеты</a>
-                <a href="news.html">Новости</a>
-                <a href="contacts.html">Контакты</a>
-                <a href="about.html">О нас</a>
-            </div>
-            <div class="footer-copy">
-                © 2026 WeToo. Все права защищены.
+    <!-- ПОДВАЛ -->
+    <footer id="main-footer" role="contentinfo">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <a href="/frontend/index.html">
+                        <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="4" y="4" width="32" height="32" rx="8" stroke="#6C63FF" stroke-width="2"/>
+                            <path d="M20 10L22.5 17.5L30 18L24 23L25.5 30.5L20 26.5L14.5 30.5L16 23L10 18L17.5 17.5L20 10Z" fill="#6C63FF"/>
+                        </svg>
+                        <span>PrivatClub</span>
+                    </a>
+                </div>
+                <div class="footer-links">
+                    <ul>
+                        <li><a href="/frontend/index.html">Главная</a></li>
+                        <li><a href="/frontend/profiles.html">Анкеты</a></li>
+                        <li><a href="/frontend/news.html">Новости</a></li>
+                        <li><a href="/frontend/contacts.html">Контакты</a></li>
+                        <li><a href="/frontend/about.html">О нас</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contacts" id="footer-contacts">
+                    <!-- Динамический рендеринг через JavaScript -->
+                </div>
+                <div class="footer-copy">
+                    <p>&copy; <span id="footer-year">2026</span> PrivatClub. Все права защищены.</p>
+                </div>
             </div>
         </div>
     </footer>
 
-    <script src="assets.js"></script>
-    <script>
-        (function() {
-            'use strict';
+    <!-- КНОПКА НАВЕРХ -->
+    <button id="btn-to-top" aria-label="Наверх">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 15L12 9L6 15"/>
+        </svg>
+    </button>
 
-            const form = document.getElementById('profileForm');
-            const submitBtn = document.getElementById('submitBtn');
-            const formError = document.getElementById('formError');
-
-            function getFormData() {
-                const name = document.getElementById('formName').value.trim();
-                const age = parseInt(document.getElementById('formAge').value);
-                const cityId = parseInt(document.getElementById('formCity').value);
-                const telegram = document.getElementById('formTelegram').value.trim();
-                const whatsapp = document.getElementById('formWhatsapp').value.trim();
-                const price = document.getElementById('formPrice').value.trim();
-                const description = document.getElementById('formDescription').value.trim();
-                const selectedPlan = document.querySelector('input[name="plan_id"]:checked');
-                const planId = selectedPlan ? parseInt(selectedPlan.value) : null;
-                const photos = document.getElementById('formPhotos').files;
-
-                const errors = [];
-                if (!name || name.length < 2) errors.push('Имя должно быть минимум 2 символа');
-                if (!age || age < 18 || age > 120) errors.push('Возраст должен быть от 18 до 120 лет');
-                if (!cityId) errors.push('Выберите город');
-                if (!telegram || !telegram.startsWith('@')) errors.push('Укажите корректный Telegram (@username)');
-                if (!description || description.length < 10) errors.push('Описание должно быть минимум 10 символов');
-                if (photos.length === 0) errors.push('Загрузите хотя бы одно фото');
-                if (photos.length > 5) errors.push('Максимум 5 фотографий');
-                if (!planId) errors.push('Выберите тариф');
-                if (telegram && !/^@[a-zA-Z0-9_]{1,32}$/.test(telegram)) {
-                    errors.push('Некорректный формат Telegram (@username)');
-                }
-
-                const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-                for (const file of photos) {
-                    if (!allowedTypes.includes(file.type)) {
-                        errors.push('Некорректный формат фото: ' + file.name);
-                        break;
-                    }
-                    if (file.size > 5 * 1024 * 1024) {
-                        errors.push('Файл слишком большой: ' + file.name);
-                        break;
-                    }
-                }
-
-                return {
-                    name,
-                    age,
-                    city_id: cityId,
-                    telegram,
-                    whatsapp,
-                    price: price ? parseFloat(price) : null,
-                    description,
-                    plan_id: planId,
-                    photos,
-                    errors
-                };
-            }
-
-            function showError(message) {
-                formError.textContent = message;
-                formError.style.display = 'block';
-                setTimeout(() => { formError.style.display = 'none'; }, 5000);
-            }
-
-            form.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                const data = getFormData();
-                if (data.errors.length > 0) {
-                    showError(data.errors.join('. '));
-                    return;
-                }
-
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Отправка...';
-
-                const formData = new FormData();
-                formData.append('name', data.name);
-                formData.append('age', data.age);
-                formData.append('city_id', data.city_id);
-                formData.append('telegram', data.telegram);
-                formData.append('whatsapp', data.whatsapp || '');
-                formData.append('description', data.description);
-                formData.append('plan_id', data.plan_id);
-                if (data.price) formData.append('price', data.price);
-                for (const file of data.photos) {
-                    formData.append('photos[]', file);
-                }
-
-                try {
-                    const response = await fetch('/api/profiles/', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    const result = await response.json();
-                    if (!response.ok) throw new Error(result.error || 'Ошибка при создании анкеты');
-                    if (result.id) {
-                        window.location.href = 'payment.html?profile_id=' + result.id;
-                    } else {
-                        throw new Error('ID анкеты не получен');
-                    }
-                } catch (error) {
-                    console.error('Ошибка:', error);
-                    showError(error.message || 'Ошибка соединения с сервером');
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = '💰 Перейти к оплате';
-                }
-            });
-
-            document.addEventListener('DOMContentLoaded', function() {
-                initBurger();
-                const photoInput = document.getElementById('formPhotos');
-                const previewContainer = document.getElementById('photoPreview');
-                photoInput.addEventListener('change', function() {
-                    previewPhotos(this, previewContainer, 5);
-                });
-            });
-
-        })();
-    </script>
+    <script src="/frontend/app.js"></script>
 </body>
 </html>
