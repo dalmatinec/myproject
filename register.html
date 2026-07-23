@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Регистрация — Custodia</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand">
+      <span class="seal brand-mark"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="15" stroke="#d4af6a" stroke-width="1.4"/><circle cx="16" cy="16" r="10.5" stroke="#7c6ff0" stroke-width="1.2"/><path d="M16 8.5L18 14H23L19 17.5L20.5 23L16 19.5L11.5 23L13 17.5L9 14H14L16 8.5Z" fill="#d4af6a"/></svg></span>
+      <span class="brand-name">Custodia</span>
+    </a>
+    <div class="nav-links"></div>
+    <div class="nav-actions"><a href="login.html" class="btn btn-ghost btn-sm">Уже есть аккаунт?</a></div>
+  </div>
+</nav>
+
+<div class="auth-shell">
+  <div class="auth-side">
+    <span class="seal"><svg width="46" height="46" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="15" stroke="#d4af6a" stroke-width="1.2"/><circle cx="16" cy="16" r="10.5" stroke="#7c6ff0" stroke-width="1"/><path d="M16 8.5L18 14H23L19 17.5L20.5 23L16 19.5L11.5 23L13 17.5L9 14H14L16 8.5Z" fill="#d4af6a"/></svg></span>
+    <h2>Присоединяйтесь к приватному сообществу коллекционеров</h2>
+    <p class="lead">128 400+ участников уже покупают, продают и участвуют в аукционах на Custodia — без компромиссов по приватности.</p>
+    <div class="auth-perks">
+      <div class="auth-perk">
+        <div class="perk-icon" style="background:var(--accent-soft); color:var(--accent);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></div>
+        <div><b>Полное шифрование переписок</b><span>Ваши сообщения не читает никто, кроме собеседника</span></div>
+      </div>
+      <div class="auth-perk">
+        <div class="perk-icon" style="background:var(--accent-2-soft); color:var(--accent-2);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></div>
+        <div><b>Эскроу для каждой сделки</b><span>Средства защищены до подтверждения получения</span></div>
+      </div>
+      <div class="auth-perk">
+        <div class="perk-icon" style="background:var(--accent-soft); color:var(--accent);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 4v6c0 5-3.4 8.4-8 10-4.6-1.6-8-5-8-10V6l8-4z"/></svg></div>
+        <div><b>Верификация продавцов</b><span>Уровень доверия виден по каждому профилю</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-form-wrap">
+    <div class="auth-card glass">
+      <h1>Создать аккаунт</h1>
+      <p class="sub">Это займёт меньше минуты</p>
+
+      <form data-success="Аккаунт создан" data-redirect="index.html">
+        <div class="field">
+          <label for="reg-email">Email</label>
+          <div class="field-with-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+            <input type="email" id="reg-email" placeholder="you@example.com" required>
+          </div>
+        </div>
+        <div class="field">
+          <label for="reg-login">Логин</label>
+          <div class="field-with-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+            <input type="text" id="reg-login" placeholder="username" required>
+          </div>
+        </div>
+        <div class="field">
+          <label for="reg-pass">Пароль</label>
+          <div class="field-with-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
+            <input type="password" id="reg-pass" placeholder="Минимум 8 символов" required>
+            <button type="button" class="toggle-pass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="reg-pass2">Подтверждение пароля</label>
+          <div class="field-with-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
+            <input type="password" id="reg-pass2" placeholder="Повторите пароль" required>
+            <button type="button" class="toggle-pass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          </div>
+        </div>
+        <div class="check-row">
+          <input type="checkbox" id="age18" required>
+          <label for="age18">Мне исполнилось 18 лет</label>
+        </div>
+        <div class="check-row" style="margin-top:-14px;">
+          <input type="checkbox" id="terms" required>
+          <label for="terms">Я согласен с <a href="#">условиями</a> и <a href="#">политикой конфиденциальности</a></label>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg btn-block">Создать аккаунт</button>
+      </form>
+
+      <div class="auth-divider">или</div>
+      <button class="btn btn-ghost btn-block" onclick="showToast('Демо: вход через Apple ID')">Продолжить с Apple ID</button>
+      <div class="auth-foot">Уже есть аккаунт? <a href="login.html">Войти</a></div>
+    </div>
+  </div>
+</div>
+
+<script src="main.js"></script>
+</body>
+</html>
